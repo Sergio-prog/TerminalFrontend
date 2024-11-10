@@ -2,6 +2,16 @@ import { useState, useEffect } from 'react'
 import { ArrowLeft, ChevronRight } from 'lucide-react'
 import { Button } from "./ui/button"
 
+import dogsIcon from '../../public/images/token_logo/dogs.svg';
+import scaleIcon from '../../public/images/token_logo/scale.svg';
+import durevIcon from '../../public/images/token_logo/durev.svg';
+import tcatIcon from '../../public/images/token_logo/tcat.svg';
+import aicIcon from '../../public/images/token_logo/aic.svg';
+import amoreIcon from '../../public/images/token_logo/amore.svg';
+import redoIcon from '../../public/images/token_logo/redo.svg';
+import batyaIcon from '../../public/images/token_logo/batya.svg';
+
+
 interface TokenDetail {
     id: string
     name: string
@@ -14,87 +24,87 @@ interface TokenDetail {
 }
 
 const TokenDetails: Record<string, TokenDetail> = {
-  "1": {
-      id: "1",
-      name: "DOGS",
-      icon: "../../public/images/token_logo/dogs.svg",
-      price: 0.1234,
-      change24h: 5.67,
-      marketCap: 340000000,
-      volume: 217000000,
-      supply: 1000000000
-  },
-  "2": {
-      id: "2",
-      name: "Scale",
-      icon: "../../public/images/token_logo/scale.svg",
-      price: 2.3456,
-      change24h: -3.21,
-      marketCap: 340000000,
-      volume: 217000000,
-      supply: 500000000
-  },
-  "3": {
-      id: "3",
-      name: "Durev",
-      icon: "../../public/images/token_logo/durev.svg",
-      price: 1.5678,
-      change24h: 1.23,
-      marketCap: 340000000,
-      volume: 217000000,
-      supply: 800000000
-  },
-  "4": {
-      id: "4",
-      name: "TCAT",
-      icon: "../../public/images/token_logo/tcat.svg",
-      price: 0.9876,
-      change24h: 2.34,
-      marketCap: 340000000,
-      volume: 217000000,
-      supply: 750000000
-  },
-  "5": {
-      id: "5",
-      name: "AIC",
-      icon: "../../public/images/token_logo/aic.svg",
-      price: 3.7890,
-      change24h: -1.56,
-      marketCap: 340000000,
-      volume: 217000000,
-      supply: 600000000
-  },
-  "6": {
-      id: "6",
-      name: "AMORE",
-      icon: "../../public/images/token_logo/amore.svg",
-      price: 0.4567,
-      change24h: 4.56,
-      marketCap: 340000000,
-      volume: 217000000,
-      supply: 900000000
-  },
-  "7": {
-      id: "7",
-      name: "Redo",
-      icon: "../../public/images/token_logo/redo.svg",
-      price: 1.2345,
-      change24h: -0.45,
-      marketCap: 340000000,
-      volume: 217000000,
-      supply: 850000000
-  },
-  "8": {
-      id: "8",
-      name: "Batya",
-      icon: "../../public/images/token_logo/batya.svg",
-      price: 2.8901,
-      change24h: 3.89,
-      marketCap: 340000000,
-      volume: 217000000,
-      supply: 700000000
-  }
-};
+    "1": {
+        id: "1",
+        name: "DOGS",
+        icon: dogsIcon,
+        price: 0.1234,
+        change24h: 5.67,
+        marketCap: 340000000,
+        volume: 217000000,
+        supply: 1000000000
+    },
+    "2": {
+        id: "2",
+        name: "Scale",
+        icon: scaleIcon,
+        price: 2.3456,
+        change24h: -3.21,
+        marketCap: 340000000,
+        volume: 217000000,
+        supply: 500000000
+    },
+    "3": {
+        id: "3",
+        name: "Durev",
+        icon: durevIcon,
+        price: 1.5678,
+        change24h: 1.23,
+        marketCap: 340000000,
+        volume: 217000000,
+        supply: 800000000
+    },
+    "4": {
+        id: "4",
+        name: "TCAT",
+        icon: tcatIcon,
+        price: 0.9876,
+        change24h: 2.34,
+        marketCap: 340000000,
+        volume: 217000000,
+        supply: 750000000
+    },
+    "5": {
+        id: "5",
+        name: "AIC",
+        icon: aicIcon,
+        price: 3.7890,
+        change24h: -1.56,
+        marketCap: 340000000,
+        volume: 217000000,
+        supply: 600000000
+    },
+    "6": {
+        id: "6",
+        name: "AMORE",
+        icon: amoreIcon,
+        price: 0.4567,
+        change24h: 4.56,
+        marketCap: 340000000,
+        volume: 217000000,
+        supply: 900000000
+    },
+    "7": {
+        id: "7",
+        name: "Redo",
+        icon: redoIcon,
+        price: 1.2345,
+        change24h: -0.45,
+        marketCap: 340000000,
+        volume: 217000000,
+        supply: 850000000
+    },
+    "8": {
+        id: "8",
+        name: "Batya",
+        icon: batyaIcon,
+        price: 2.8901,
+        change24h: 3.89,
+        marketCap: 340000000,
+        volume: 217000000,
+        supply: 700000000
+    }
+}
 
 export function TokenDetail({ pairId, onBack }: { pairId: string, onBack: () => void }) {
     const [data, setData] = useState<TokenDetail | null>(null);

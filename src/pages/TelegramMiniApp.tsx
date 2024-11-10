@@ -1,5 +1,15 @@
 'use client'
 
+import logo from '../../public/images/logo.svg';
+import { useCallback, useEffect, useState } from 'react'
+// import { Search, Table, Wallet } from 'lucide-react'
+import { TonConnectButton, useTonConnectUI, useTonWallet } from '@tonconnect/ui-react'
+import { TokenDetail } from '../components/TokenDetail'
+import { Button } from '../components/ui/button'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
+import { Search } from 'lucide-react'
+import WebApp from '@twa-dev/sdk'
+
 import dogsIcon from '../../public/images/token_logo/dogs.svg';
 import scaleIcon from '../../public/images/token_logo/scale.svg';
 import durevIcon from '../../public/images/token_logo/durev.svg';
@@ -8,7 +18,6 @@ import aicIcon from '../../public/images/token_logo/aic.svg';
 import amoreIcon from '../../public/images/token_logo/amore.svg';
 import redoIcon from '../../public/images/token_logo/redo.svg';
 import batyaIcon from '../../public/images/token_logo/batya.svg';
-import { useCallback, useEffect, useState } from 'react'
 
 
 interface TradingPair {
