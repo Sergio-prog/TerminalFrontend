@@ -199,6 +199,12 @@ export default function TelegramMiniApp() {
               </p>
             </div>
 
+            { connected && signedMessage && (
+                <div className="p-4 bg-green-800 text-white">
+                    Message signed successfully!
+                </div>
+            )}
+
             {activeTab === 'pairs' ? (
                 selectedPairId ? (
                     <TokenDetail pairId={selectedPairId} onBack={() => setSelectedPairId(null)} />
