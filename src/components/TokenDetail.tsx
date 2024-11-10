@@ -10,6 +10,7 @@ import aicIcon from '../../public/images/token_logo/aic.svg';
 import amoreIcon from '../../public/images/token_logo/amore.svg';
 import redoIcon from '../../public/images/token_logo/redo.svg';
 import batyaIcon from '../../public/images/token_logo/batya.svg';
+import DexScreenerEmbed from './DexScreenerEmbed';
 
 
 interface TokenDetail {
@@ -20,7 +21,8 @@ interface TokenDetail {
     change24h: number
     marketCap: number
     volume: number
-    supply: number
+    supply: number,
+    poolAddress: string,
 }
 
 const TokenDetails: Record<string, TokenDetail> = {
@@ -32,7 +34,8 @@ const TokenDetails: Record<string, TokenDetail> = {
         change24h: 5.67,
         marketCap: 340000000,
         volume: 217000000,
-        supply: 1000000000
+        supply: 1000000000,
+        poolAddress: "eqbjb_2tldpohhj25f_gymm6fmb8hbi3rx-ea4g_alr9o0rj",
     },
     "2": {
         id: "2",
@@ -42,7 +45,8 @@ const TokenDetails: Record<string, TokenDetail> = {
         change24h: -3.21,
         marketCap: 340000000,
         volume: 217000000,
-        supply: 500000000
+        supply: 500000000,
+        poolAddress: "eqbjb_2tldpohhj25f_gymm6fmb8hbi3rx-ea4g_alr9o0rj",
     },
     "3": {
         id: "3",
@@ -52,7 +56,8 @@ const TokenDetails: Record<string, TokenDetail> = {
         change24h: 1.23,
         marketCap: 340000000,
         volume: 217000000,
-        supply: 800000000
+        supply: 800000000,
+        poolAddress: "eqbjb_2tldpohhj25f_gymm6fmb8hbi3rx-ea4g_alr9o0rj",
     },
     "4": {
         id: "4",
@@ -62,7 +67,8 @@ const TokenDetails: Record<string, TokenDetail> = {
         change24h: 2.34,
         marketCap: 340000000,
         volume: 217000000,
-        supply: 750000000
+        supply: 750000000,
+        poolAddress: "eqbjb_2tldpohhj25f_gymm6fmb8hbi3rx-ea4g_alr9o0rj",
     },
     "5": {
         id: "5",
@@ -72,7 +78,8 @@ const TokenDetails: Record<string, TokenDetail> = {
         change24h: -1.56,
         marketCap: 340000000,
         volume: 217000000,
-        supply: 600000000
+        supply: 600000000,
+        poolAddress: "eqbjb_2tldpohhj25f_gymm6fmb8hbi3rx-ea4g_alr9o0rj",
     },
     "6": {
         id: "6",
@@ -82,7 +89,8 @@ const TokenDetails: Record<string, TokenDetail> = {
         change24h: 4.56,
         marketCap: 340000000,
         volume: 217000000,
-        supply: 900000000
+        supply: 900000000,
+        poolAddress: "eqbjb_2tldpohhj25f_gymm6fmb8hbi3rx-ea4g_alr9o0rj",
     },
     "7": {
         id: "7",
@@ -92,7 +100,8 @@ const TokenDetails: Record<string, TokenDetail> = {
         change24h: -0.45,
         marketCap: 340000000,
         volume: 217000000,
-        supply: 850000000
+        supply: 850000000,
+        poolAddress: "eqbjb_2tldpohhj25f_gymm6fmb8hbi3rx-ea4g_alr9o0rj",
     },
     "8": {
         id: "8",
@@ -102,7 +111,8 @@ const TokenDetails: Record<string, TokenDetail> = {
         change24h: 3.89,
         marketCap: 340000000,
         volume: 217000000,
-        supply: 700000000
+        supply: 700000000,
+        poolAddress: "eqbjb_2tldpohhj25f_gymm6fmb8hbi3rx-ea4g_alr9o0rj",
     }
 }
 
@@ -157,6 +167,10 @@ export function TokenDetail({ pairId, onBack }: { pairId: string, onBack: () => 
 
                 <img src={data.icon} alt="" className="w-8 h-8 rounded-full" />
                 <h2 className="text-xl font-bold">{data.name}</h2>
+            </div>
+
+            <div className='mx-5 my-2'>
+                <DexScreenerEmbed tokenAddress={data.poolAddress} />
             </div>
 
             {/* Price and Change */}
