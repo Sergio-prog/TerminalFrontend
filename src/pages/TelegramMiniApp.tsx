@@ -1,14 +1,13 @@
 'use client'
 
 import logo from '../../public/images/logo.svg';
-import { useCallback, useEffect, useState } from 'react'
-// import { Search, Table, Wallet } from 'lucide-react'
-import { TonConnectButton, useTonConnectUI, useTonWallet } from '@tonconnect/ui-react'
-import { TokenDetail } from '../components/TokenDetail'
-import { Button } from '../components/ui/button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
-import { Search } from 'lucide-react'
-import WebApp from '@twa-dev/sdk'
+import { useCallback, useEffect, useState } from 'react';
+import { TonConnectButton, useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
+import { TokenDetail } from '../components/TokenDetail';
+import { Button } from '../components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
+import { Search } from 'lucide-react';
+import WebApp from '@twa-dev/sdk';
 
 import dogsIcon from '../../public/images/token_logo/dogs.svg';
 import scaleIcon from '../../public/images/token_logo/scale.svg';
@@ -19,13 +18,12 @@ import amoreIcon from '../../public/images/token_logo/amore.svg';
 import redoIcon from '../../public/images/token_logo/redo.svg';
 import batyaIcon from '../../public/images/token_logo/batya.svg';
 
-
 interface TradingPair {
-    id: string
-    name: string
-    icon: string
-    marketCap: number
-    volume: number
+    id: string;
+    name: string;
+    icon: string;
+    marketCap: number;
+    volume: number;
 }
 
 const TradingPairs: TradingPair[] = [
@@ -40,19 +38,18 @@ const TradingPairs: TradingPair[] = [
 ];
 
 function TradingPairsList({ onSelectPair }: { onSelectPair: (id: string) => void }) {
-    const [page, setPage] = useState(1)
-    const itemsPerPage = 5
-    const startIndex = (page - 1) * itemsPerPage
-    const endIndex = startIndex + itemsPerPage
-    const displayedPairs = TradingPairs.slice(startIndex, endIndex)
+    const [page, setPage] = useState(1);
+    const itemsPerPage = 5;
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const displayedPairs = TradingPairs.slice(startIndex, endIndex);
 
     const formatMillions = (value: number) => {
-        return `$${(value / 1000000).toFixed(1)}m`
-    }
+        return `$${(value / 1000000).toFixed(1)}m`;
+    };
 
     return (
         <>
-            {/* Trading Pairs List */}
             <div className="flex-1 overflow-auto">
                 <Table>
                     <TableHeader>
@@ -122,28 +119,24 @@ function TradingPairsList({ onSelectPair }: { onSelectPair: (id: string) => void
                 </Button>
             </div>
         </>
-    )
+    );
 }
 
 export default function TelegramMiniApp() {
-    const [selectedPairId, setSelectedPairId] = useState<string | null>(null)
-    const [signedMessage, setSignedMessage] = useState<string | null>(null)
+    const [selectedPairId, setSelectedPairId] = useState<string | null>(null);
+    const [signedMessage, setSignedMessage] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState<'pairs' | 'positions'>('pairs');
 
-    const connected = useTonWallet()
+    const connected = useTonWallet();
     const [tonConnectUi] = useTonConnectUI();
 
-
-    // const handleConnect = useCallback(() => {
-    //     open()
-    // }, [open])
-
     const handleSignMessage = useCallback(async () => {
-        if (!connected) return
+        if (!connected) return;
 
-        const message = 'Welcome to TerminalX!'
+        const message = 'Welcome to TerminalX!';
         try {
             const result = await tonConnectUi.sendTransaction({
-                validUntil: Math.floor(Date.now() / 1000) + 60, // Valid for 60 seconds
+                validUntil: Math.floor(Date.now() / 1000) + 60,
                 messages: [
                     {
                         address: '0:8c397c43f9ff0b49659b5d0a302b1a93af7ccc63e5f5c0c4f25a9dc1f8b47ab3',
@@ -151,21 +144,16 @@ export default function TelegramMiniApp() {
                         payload: Buffer.from(message).toString('hex'),
                     },
                 ],
-            })
-            setSignedMessage(result.boc)
+            });
+            setSignedMessage(result.boc);
         } catch (error) {
-            console.error('Error signing message:', error)
+            console.error('Error signing message:', error);
         }
-    }, [connected])
+    }, [connected]);
 
     useEffect(() => {
-        // Set the app header color
         WebApp.setHeaderColor('#0a0a0a');
-
-        // Expand the app to full height
         WebApp.expand();
-
-        // You can also use WebApp.ready() here if needed
         WebApp.ready();
     }, []);
 
@@ -186,10 +174,6 @@ export default function TelegramMiniApp() {
                             Sign
                         </Button>
                     ) : (
-                        // <Button onClick={handleConnect} variant="ghost" className="text-blue-500 hover:bg-gray-800">
-                        //   <Wallet className="h-5 w-5 mr-2" />
-                        //   Connect Wallet
-                        // </Button>
                         <TonConnectButton />
                     )}
                 </div>
@@ -197,25 +181,35 @@ export default function TelegramMiniApp() {
 
             {/* Tabs */}
             <div className="flex gap-4 p-4 border-b border-gray-800">
-                <p className="text-white hover:bg-gray-800">
-                    Pairs
-                </p>
-                <p className="text-white">
-                    My positions
-                </p>
+              <p
+                className={`text-white cursor-pointer ${
+                  activeTab === 'pairs' ? 'border-b-2 border-blue-500' : 'hover:bg-gray-800'
+                }`}
+              onClick={() => setActiveTab('pairs')}
+              >
+                Pairs
+              </p>
+              <p
+                className={`text-white cursor-pointer ${
+                  activeTab === 'positions' ? 'border-b-2 border-blue-500' : 'hover:bg-gray-800'
+                }`}
+                onClick={() => setActiveTab('positions')}
+              >
+                My positions
+              </p>
             </div>
 
-            {connected && signedMessage && (
-                <div className="p-4 bg-green-800 text-white">
-                    Message signed successfully!
+            {activeTab === 'pairs' ? (
+                selectedPairId ? (
+                    <TokenDetail pairId={selectedPairId} onBack={() => setSelectedPairId(null)} />
+                ) : (
+                    <TradingPairsList onSelectPair={setSelectedPairId} />
+                )
+            ) : (
+                <div className="p-4">
+                    <p className="text-center text-gray-400">You currently have no open positions.</p>
                 </div>
             )}
-
-            {selectedPairId ? (
-                <TokenDetail pairId={selectedPairId} onBack={() => setSelectedPairId(null)} />
-            ) : (
-                <TradingPairsList onSelectPair={setSelectedPairId} />
-            )}
         </div>
-    )
+    );
 }
