@@ -1,5 +1,3 @@
-import React from 'react';
-
 const DexScreenerEmbed = ({ tokenAddress }: { tokenAddress: string }) => {
     console.log(`https://dexscreener.com/ton/${tokenAddress}?embed=1&theme=dark`);
     return (
