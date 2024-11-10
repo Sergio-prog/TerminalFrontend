@@ -1,14 +1,15 @@
 'use client'
 
-import logo from '../../public/images/logo.svg';
+import dogsIcon from '../../public/images/token_logo/dogs.svg';
+import scaleIcon from '../../public/images/token_logo/scale.svg';
+import durevIcon from '../../public/images/token_logo/durev.svg';
+import tcatIcon from '../../public/images/token_logo/tcat.svg';
+import aicIcon from '../../public/images/token_logo/aic.svg';
+import amoreIcon from '../../public/images/token_logo/amore.svg';
+import redoIcon from '../../public/images/token_logo/redo.svg';
+import batyaIcon from '../../public/images/token_logo/batya.svg';
 import { useCallback, useEffect, useState } from 'react'
-// import { Search, Table, Wallet } from 'lucide-react'
-import { TonConnectButton, useTonConnectUI, useTonWallet } from '@tonconnect/ui-react'
-import { TokenDetail } from '../components/TokenDetail'
-import { Button } from '../components/ui/button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table'
-import { Search } from 'lucide-react'
-import WebApp from '@twa-dev/sdk'
+
 
 interface TradingPair {
     id: string
@@ -19,14 +20,14 @@ interface TradingPair {
 }
 
 const TradingPairs: TradingPair[] = [
-    { id: "1", name: "DOGS", icon: "../../public/images/token_logo/dogs.svg", marketCap: 340000000, volume: 217000000 },
-    { id: "2", name: "Scale", icon: "../../public/images/token_logo/scale.svg", marketCap: 340000000, volume: 217000000 },
-    { id: "3", name: "Durev", icon: "../../public/images/token_logo/durev.svg", marketCap: 340000000, volume: 217000000 },
-    { id: "4", name: "TCAT", icon: "../../public/images/token_logo/tcat.svg", marketCap: 340000000, volume: 217000000 },
-    { id: "5", name: "AIC", icon: "../../public/images/token_logo/aic.svg", marketCap: 340000000, volume: 217000000 },
-    { id: "6", name: "AMORE", icon: "../../public/images/token_logo/amore.svg", marketCap: 340000000, volume: 217000000 },
-    { id: "7", name: "Redo", icon: "../../public/images/token_logo/redo.svg", marketCap: 340000000, volume: 217000000 },
-    { id: "8", name: "Batya", icon: "../../public/images/token_logo/batya.svg", marketCap: 340000000, volume: 217000000 },
+    { id: "1", name: "DOGS", icon: dogsIcon, marketCap: 340000000, volume: 217000000 },
+    { id: "2", name: "Scale", icon: scaleIcon, marketCap: 340000000, volume: 217000000 },
+    { id: "3", name: "Durev", icon: durevIcon, marketCap: 340000000, volume: 217000000 },
+    { id: "4", name: "TCAT", icon: tcatIcon, marketCap: 340000000, volume: 217000000 },
+    { id: "5", name: "AIC", icon: aicIcon, marketCap: 340000000, volume: 217000000 },
+    { id: "6", name: "AMORE", icon: amoreIcon, marketCap: 340000000, volume: 217000000 },
+    { id: "7", name: "Redo", icon: redoIcon, marketCap: 340000000, volume: 217000000 },
+    { id: "8", name: "Batya", icon: batyaIcon, marketCap: 340000000, volume: 217000000 },
 ];
 
 function TradingPairsList({ onSelectPair }: { onSelectPair: (id: string) => void }) {
