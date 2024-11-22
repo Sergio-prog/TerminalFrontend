@@ -1,4 +1,3 @@
-import React from 'react';
 import { cn } from "../../lib/utils"
 
 type TimeRange = 'm5' | 'h1' | 'h6' | 'h24';
