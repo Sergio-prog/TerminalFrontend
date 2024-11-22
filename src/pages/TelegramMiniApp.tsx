@@ -32,10 +32,6 @@ function TradingPairsList({ onSelectPair }: { onSelectPair: (id: string) => void
     loadPairs();
   }, []);
 
-  // const formatMillions = (value: number) => {
-  //   return `$${(value / 1000000).toFixed(1)}m`;
-  // };
-
   return (
     <>
       <div className="flex-1 overflow-auto">
@@ -152,6 +148,12 @@ export default function TelegramMiniApp() {
   const [tonConnectUi] = useTonConnectUI();
   const wallet = tonConnectUi.account;
 
+  useEffect(() => {
+    WebApp.setHeaderColor('#0a0a0a');
+    WebApp.expand();
+    WebApp.ready();
+  }, []);
+
   useCallback(async () => {
     if (!connected) return;
 
@@ -182,7 +184,11 @@ export default function TelegramMiniApp() {
   return (
     <div className="flex flex-col min-h-screen bg-[#0a0a0a] text-white">
       <div className="flex items-center justify-between p-4 border-b border-gray-800">
-        <div className="flex items-center gap-2">
+        <div
+          onClick={() => (window.location.href = '/')} // Navigates to the root
+          className="flex items-center gap-2 cursor-pointer"
+          title="Go to trending page" // Tooltip for better UX
+        >
           <img src={logo} alt="Logo" className="w-[25px] h-[25px]" />
           <h1 className="text-lg font-semibold">TerminalX</h1>
         </div>
@@ -213,8 +219,10 @@ export default function TelegramMiniApp() {
             <ConnectButton />
           )}
         </div>
-
       </div>
+
+
+
 
       <div className="flex gap-4 p-4 border-b border-gray-800">
         <p

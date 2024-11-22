@@ -32,7 +32,7 @@ export function PriceChangeTabs({ priceChange, selectedTimeRange, onSelectTimeRa
               selectedTimeRange === range
                 ? "bg-neutral-800 text-white"
                 : "text-gray-400 hover:text-white",
-              "rounded-t-md rounded-b-none" // Apply rounded top corners to all tabs
+              "rounded-t-md rounded-b-none"
             )}
           >
             <div>{timeRangeDisplay[range]}</div>

@@ -43,7 +43,7 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
         if (data?.tokenAddress) {
             await navigator.clipboard.writeText(data.tokenAddress);
             setIsCopied(true);
-            setTimeout(() => setIsCopied(false), 2000); // Reset icon after 2 seconds
+            setTimeout(() => setIsCopied(false), 2000);
         }
     };
 
@@ -86,7 +86,6 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
                     </h2>
                 </div>
                 <div className="flex lg:gap-8 gap-3">
-                    {/* Market Price */}
                     <div className="text-left">
                         <div className="lg:text-sm text-xs font-light text-gray-400">Market price</div>
                         <div className="flex items-center">

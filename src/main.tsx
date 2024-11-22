@@ -6,7 +6,6 @@ import './index.css'
 import { TonConnectUIProvider } from '@tonconnect/ui-react'
 import { tonConnectOptions } from './lib/ton-connect.ts'
 import WebApp from '@twa-dev/sdk'
-// import { tonConnectOptions } from './lib/ton-connect.ts'
 
 WebApp.ready();
 
