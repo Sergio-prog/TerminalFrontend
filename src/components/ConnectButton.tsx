@@ -1,6 +1,4 @@
-import React from 'react';
-import { TonConnectButton, useTonConnectUI } from '@tonconnect/ui-react';
-import { Button } from './ui/button';
+import { useTonConnectUI } from '@tonconnect/ui-react';
 
 interface ConnectButtonProps {
   className?: string;

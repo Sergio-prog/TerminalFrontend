@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ChevronDown, X } from 'lucide-react'
 import { cn } from "../../lib/utils"
 import { useTonConnectUI } from '@tonconnect/ui-react'
