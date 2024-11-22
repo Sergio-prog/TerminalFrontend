@@ -7,7 +7,7 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
+  color-scheme: dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
 
@@ -19,6 +19,31 @@
   --foreground-rgb: 255, 255, 255;
   --background-start-rgb: 0, 0, 0;
   --background-end-rgb: 0, 0, 0;
+}
+
+.go3974562317 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background-color: #0098EA;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.go54158285 {
+  border: none;
+  outline: none;
+}
+
+.go3974562317:hover {
+  background-color: #0080C4;
+}
+
+.go1487791704 {
+  font-family: sans-serif;
 }
 
 a {
