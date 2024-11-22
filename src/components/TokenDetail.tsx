@@ -90,7 +90,7 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
                     <div className="text-left">
                         <div className="lg:text-sm text-xs font-light text-gray-400">Market price</div>
                         <div className="flex items-center">
-                            <span className="lg:text-lg font-semibold text-xs">{data.price} TON</span>
+                            <span className="lg:text-lg font-semibold text-xs">{data.price}$</span>
                             <span className={`ml-2 lg:text-sm text-xs ${raw_percentage > 0 ? 'text-green-500' : 'text-red-500'}`}>
                                 {formatted_percentage}
                             </span>
