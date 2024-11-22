@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface VolumeIndicatorProps {
   volume: number;
   txns: {

@@ -2,7 +2,7 @@
 
 import logo from '../../public/images/logo.svg';
 import { useCallback, useEffect, useState } from 'react';
-import { TonConnectButton, toUserFriendlyAddress, useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
+import { toUserFriendlyAddress, useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
 import { TokenDetail } from '../components/TokenDetail';
 import { Button } from '../components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
@@ -32,9 +32,9 @@ function TradingPairsList({ onSelectPair }: { onSelectPair: (id: string) => void
     loadPairs();
   }, []);
 
-  const formatMillions = (value: number) => {
-    return `$${(value / 1000000).toFixed(1)}m`;
-  };
+  // const formatMillions = (value: number) => {
+  //   return `$${(value / 1000000).toFixed(1)}m`;
+  // };
 
   return (
     <>
@@ -152,7 +152,7 @@ export default function TelegramMiniApp() {
   const [tonConnectUi] = useTonConnectUI();
   const wallet = tonConnectUi.account;
 
-  const handleSignMessage = useCallback(async () => {
+  useCallback(async () => {
     if (!connected) return;
 
     const message = 'Welcome to TerminalX!';

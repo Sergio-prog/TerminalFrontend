@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
-import { ArrowLeft, ChevronRight, Check, Copy } from 'lucide-react'
+import { ArrowLeft, Check, Copy } from 'lucide-react'
 import { BuyModal } from './ui/buy-modal';
 import { SellModal } from './ui/sell-modal';
 import { fetchPairDetail, PairDetail } from '../lib/api';
 import DexScreenerEmbed from './DexScreenerEmbed';
 import { PriceChangeTabs } from './ui/price-change-tabs';
 import { VolumeIndicator } from '../components/ui/volume-indicator';
-import { useTonWallet, useTonConnectUI } from '@tonconnect/ui-react';
 
 type TimeRange = 'm5' | 'h1' | 'h6' | 'h24';
 
