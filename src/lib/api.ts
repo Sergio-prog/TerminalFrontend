@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = 'https://secret-ocean-19070-7d15bdda8dde.herokuapp.com/api';
 export type TimeRange = 'm5' | 'h1' | 'h6' | 'h24';
 
 export interface NewPair {
