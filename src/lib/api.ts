@@ -59,7 +59,7 @@ export async function fetchNewPairs(): Promise<NewPair[]> {
       chainId: item.relationships.dex.data.id,
       tokenAddress: item.attributes.address,
       icon: item.attributes.image_url === 'missing.png'
-        ? '/public/images/missing.png' // Fallback to local missing image
+        ? '/images/missing.png' // Fallback to local missing image
         : item.attributes.image_url, // Use the provided URL if available
       header: item.attributes.name,
       symbol: item.attributes.symbol,

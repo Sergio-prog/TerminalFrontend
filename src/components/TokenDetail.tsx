@@ -66,7 +66,7 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
                 <div className="flex items-center gap-4">
                     <ArrowLeft onClick={onBack} className="h-8 w-8 cursor-pointer" />
                     <img
-                        src={data.icon ?? "/public/images/missing.png"}
+                        src={data.icon ?? "/images/missing.png"}
                         alt=""
                         className="w-8 h-8 rounded-full"
                     />
