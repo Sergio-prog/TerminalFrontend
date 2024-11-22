@@ -115,7 +115,7 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
                     BUY
                 </button>
                 <button
-                    className="w-1/2 bg-[#212121] text-white font-semibold text-center py-3 rounded"
+                    className="w-1/2 bg-[#FF7373] text-white font-semibold text-center py-3 rounded"
                     onClick={() => setIsSellModalOpen(true)}
                 >
                     SELL

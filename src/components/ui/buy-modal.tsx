@@ -65,7 +65,7 @@ export function BuyModal({ isOpen, onClose }: BuyModalProps) {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 sm:items-center" onClick={onClose}>
+    <div className="fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 sm:items-center z-50" onClick={onClose}>
       <div
         ref={modalRef}
         className="bg-neutral-900 text-white p-6 rounded-t-lg sm:rounded-lg w-full sm:w-[28rem] space-y-6 max-h-[75vh] overflow-y-auto"
