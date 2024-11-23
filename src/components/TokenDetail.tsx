@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Check, Copy, ChevronRight } from 'lucide-react'
+import { Check, Copy, ChevronRight, ChevronLeft } from 'lucide-react'
 import { BuyModal } from './ui/buy-modal';
 import { SellModal } from './ui/sell-modal';
 import { fetchPairDetail, PairDetail } from '../lib/api';
@@ -18,8 +18,10 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
     const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
     const [isSellModalOpen, setIsSellModalOpen] = useState(false);
     const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('h24');
-    const [isScrollable, setIsScrollable] = useState(false);
+    const [canScrollLeft, setCanScrollLeft] = useState(false);
+    const [canScrollRight, setCanScrollRight] = useState(false);
     const headerRef = useRef<HTMLDivElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -40,10 +42,10 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
         WebApp.BackButton.onClick(onBack);
 
         const checkScrollable = () => {
-            if (headerRef.current) {
-                const isContentOverflowing = headerRef.current.scrollWidth > headerRef.current.clientWidth;
-                const isSmallScreen = window.innerWidth < 768;
-                setIsScrollable(isContentOverflowing && isSmallScreen);
+            if (contentRef.current) {
+                const { scrollLeft, scrollWidth, clientWidth } = contentRef.current;
+                setCanScrollLeft(scrollLeft > 0);
+                setCanScrollRight(scrollLeft < scrollWidth - clientWidth);
             }
         };
 
@@ -72,6 +74,23 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
         };
     };
 
+    const scrollHeader = (direction: 'left' | 'right') => {
+        if (contentRef.current) {
+            const scrollAmount = 100;
+            contentRef.current.scrollBy({
+                left: direction === 'left' ? -scrollAmount : scrollAmount,
+                behavior: 'smooth'
+            });
+            setTimeout(() => {
+                if (contentRef.current) {
+                    const { scrollLeft, scrollWidth, clientWidth } = contentRef.current;
+                    setCanScrollLeft(scrollLeft > 0);
+                    setCanScrollRight(scrollLeft < scrollWidth - clientWidth);
+                }
+            }, 300);
+        }
+    };
+
     if (isLoading) return <div className="p-4 text-center text-gray-500">Loading...</div>;
     if (error) return <div className="p-4 text-center text-red-500">{error.message}</div>;
     if (!data) return null;
@@ -80,15 +99,22 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
 
     return (
         <div className="flex flex-col h-full">
-            <div className="relative border-b border-gray-800">
+            <div className="relative border-b border-gray-800" ref={headerRef}>
                 <div
-                    ref={headerRef}
-                    className={`flex items-center justify-between p-4 ${isScrollable ? 'overflow-x-auto scrollbar-hide' : ''}`}
+                    ref={contentRef}
+                    className="flex items-center p-4 overflow-x-auto scrollbar-hide"
+                    onScroll={() => {
+                        if (contentRef.current) {
+                            const { scrollLeft, scrollWidth, clientWidth } = contentRef.current;
+                            setCanScrollLeft(scrollLeft > 0);
+                            setCanScrollRight(scrollLeft < scrollWidth - clientWidth);
+                        }
+                    }}
                 >
-                    <div className="flex items-center gap-4 flex-shrink-0">
+                    <div className="flex items-center gap-4 flex-shrink-0 mr-8">
                         <img
                             src={data.icon ?? "/images/missing.png"}
-                            alt=""
+                            alt={`${data.name} icon`}
                             className="w-8 h-8 rounded-full"
                         />
                         <h2 className="text-base font-bold flex items-center gap-3">
@@ -97,6 +123,7 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
                                 onClick={handleCopy}
                                 className="p-0 text-gray-400 hover:text-white transition-colors"
                                 title="Copy token address"
+                                aria-label={isCopied ? "Token address copied" : "Copy token address"}
                             >
                                 {isCopied ? (
                                     <Check className="w-4 h-4 text-green-500" />
@@ -106,7 +133,7 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
                             </button>
                         </h2>
                     </div>
-                    <div className={`flex gap-8 ${isScrollable ? 'flex-shrink-0' : ''}`}>
+                    <div className="flex gap-8 flex-shrink-0">
                         <div className="text-left">
                             <div className="text-sm font-light text-gray-400">Market price</div>
                             <div className="flex items-center">
@@ -122,10 +149,23 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
                         </div>
                     </div>
                 </div>
-                {isScrollable && (
-                    <div className="absolute right-0 top-0 bottom-0 flex items-center bg-gradient-to-l from-[#0a0a0a] via-[#0a0a0a] to-transparent px-2">
+                {canScrollLeft && (
+                    <button
+                        onClick={() => scrollHeader('left')}
+                        className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-neutral-800 rounded-r-full p-1 focus:outline-none"
+                        aria-label="Scroll left"
+                    >
+                        <ChevronLeft className="w-4 h-4 text-gray-400" />
+                    </button>
+                )}
+                {canScrollRight && (
+                    <button
+                        onClick={() => scrollHeader('right')}
+                        className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-neutral-800 rounded-l-full p-1 focus:outline-none"
+                        aria-label="Scroll right"
+                    >
                         <ChevronRight className="w-4 h-4 text-gray-400" />
-                    </div>
+                    </button>
                 )}
             </div>
 

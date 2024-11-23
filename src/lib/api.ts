@@ -97,7 +97,7 @@ export function mapPairDetailToTokenDetail(data: any): PairDetail {
 
   console.log("assd", data.attributes?.image_url, data.info?.imageUrl, data.attributes)
   return {
-    name: data.base_token.name,
+    name: data.base_token.symbol,
     tokenAddress: data.base_token.address,
     icon: data.attributes?.image_url || data.info?.imageUrl,
     symbol: data.attributes?.symbol,
