@@ -9,15 +9,21 @@ interface SellModalProps {
   onClose: () => void;
 }
 
+type OrderType = 'Market' | 'Limit';
+type LimitType = 'MC is' | 'Price';
+
 export function SellModal({ isOpen, onClose }: SellModalProps) {
   const [tonConnectUI] = useTonConnectUI();
   const isWalletConnected = tonConnectUI.connected;
-  const [tonBalance] = useState(5.7789)
+  const [tonBalance] = useState(5.77)
   const [tonAmount, setTonAmount] = useState(0)
   const [activePercentage, setActivePercentage] = useState<number | null>(null);
   const modalRef = useRef<HTMLDivElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [startY, setStartY] = useState(0)
+  const [orderType, setOrderType] = useState<OrderType>('Market')
+  const [limitType, setLimitType] = useState<LimitType>('MC is')
+  const [limitValue, setLimitValue] = useState(0)
 
   const handlePercentageClick = (percentage: number) => {
     if (isWalletConnected) {
@@ -84,17 +90,54 @@ export function SellModal({ isOpen, onClose }: SellModalProps) {
               <img src="/images/ton_logo.png" alt="TON Logo" className="w-6 h-6" />
               <span>Balance</span>
             </div>
-            <span>{isWalletConnected ? tonBalance.toFixed(4) : '-'}</span>
+            <span>{isWalletConnected ? tonBalance.toFixed(2) : '-'}</span>
           </div>
 
-          <div className={cn("flex-1 flex justify-between items-center p-3 rounded-md relative", "bg-neutral-800")}>
-            <select className="bg-transparent focus:outline-none appearance-none pr-8 w-full" disabled={!isWalletConnected}>
-              <option>Market</option>
-              <option>Limit</option>
-            </select>
-            <ChevronDown className="h-4 w-4 absolute right-3 pointer-events-none" />
+          <div className={cn("flex-1 flex justify-between items-center p-3 rounded-md", "bg-neutral-800")}>
+            <div className="relative flex-1">
+              <select
+                className="bg-transparent focus:outline-none appearance-none w-full pr-4"
+                disabled={!isWalletConnected}
+                value={orderType}
+                onChange={(e) => setOrderType(e.target.value as OrderType)}
+              >
+                <option>Market</option>
+                <option>Limit</option>
+              </select>
+              <ChevronDown className="h-4 w-4 absolute right-0 top-1/2 transform -translate-y-1/2 pointer-events-none" />
+            </div>
           </div>
         </div>
+
+        {orderType === 'Limit' && (
+          <div className={cn("flex justify-between items-center p-3 rounded-md", "bg-neutral-800")}>
+            <div className="flex items-center relative">
+              <select
+                className="bg-transparent focus:outline-none appearance-none w-full pr-6"
+                value={limitType}
+                onChange={(e) => setLimitType(e.target.value as LimitType)}
+              >
+                <option>MC is</option>
+                <option>Price</option>
+              </select>
+              <ChevronDown className="h-4 w-4 absolute right-0 top-1/2 transform -translate-y-1/2 pointer-events-none" />
+            </div>
+            <input
+              type="text"
+              value={limitValue === 0 ? "" : limitValue}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^\d*$/.test(value)) {
+                  setLimitValue(value === "" ? 0 : Number(value));
+                }
+              }}
+              className="bg-transparent text-right focus:outline-none flex-grow placeholder-gray-500 ml-3"
+              placeholder="$"
+              inputMode="numeric"
+              pattern="[0-9]*"
+            />
+          </div>
+        )}
 
         <div className={cn("flex justify-between items-center p-3 rounded-md", "bg-neutral-800")}>
           <div className="flex items-center gap-2">
@@ -102,12 +145,19 @@ export function SellModal({ isOpen, onClose }: SellModalProps) {
             <span>TON</span>
           </div>
           <input
-            type="number"
-            value={tonAmount}
-            onChange={(e) => isWalletConnected && setTonAmount(Number(e.target.value))}
+            type="text"
+            value={tonAmount === 0 ? "" : tonAmount}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*$/.test(value)) {
+                setTonAmount(value === "" ? 0 : Number(value));
+              }
+            }}
             className="bg-transparent text-right w-24 focus:outline-none"
             placeholder="Amount"
             disabled={!isWalletConnected}
+            inputMode="numeric"
+            pattern="[0-9]*"
           />
         </div>
 
@@ -155,4 +205,3 @@ export function SellModal({ isOpen, onClose }: SellModalProps) {
     </div>
   )
 }
-

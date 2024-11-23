@@ -185,9 +185,9 @@ export default function TelegramMiniApp() {
     <div className="flex flex-col min-h-screen bg-[#0a0a0a] text-white">
       <div className="flex items-center justify-between p-4 border-b border-gray-800">
         <div
-          onClick={() => (window.location.href = '/')} // Navigates to the root
+          onClick={() => (window.location.href = '/')}
           className="flex items-center gap-2 cursor-pointer"
-          title="Go to trending page" // Tooltip for better UX
+          title="Go to trending page"
         >
           <img src={logo} alt="Logo" className="w-[25px] h-[25px]" />
           <h1 className="text-lg font-semibold">TerminalX</h1>

@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react'
-import { ArrowLeft, Check, Copy } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Check, Copy, ChevronRight } from 'lucide-react'
 import { BuyModal } from './ui/buy-modal';
 import { SellModal } from './ui/sell-modal';
 import { fetchPairDetail, PairDetail } from '../lib/api';
 import DexScreenerEmbed from './DexScreenerEmbed';
 import { PriceChangeTabs } from './ui/price-change-tabs';
 import { VolumeIndicator } from '../components/ui/volume-indicator';
+import WebApp from '@twa-dev/sdk'
 
 type TimeRange = 'm5' | 'h1' | 'h6' | 'h24';
 
@@ -17,19 +18,16 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
     const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
     const [isSellModalOpen, setIsSellModalOpen] = useState(false);
     const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('h24');
-
-    console.log("TokenDetail component rendered with address:", address);
+    const [isScrollable, setIsScrollable] = useState(false);
+    const headerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const fetchData = async () => {
-            console.log("Fetching details for address:", address);
             setIsLoading(true);
             try {
                 const tokenDetail = await fetchPairDetail(address);
-                console.log("Fetched data:", tokenDetail);
                 setData(tokenDetail);
             } catch (err) {
-                console.error("Error fetching pair details:", err);
                 setError(err instanceof Error ? err : new Error('An error occurred'));
             } finally {
                 setIsLoading(false);
@@ -37,7 +35,27 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
         };
 
         fetchData();
-    }, [address]);
+
+        WebApp.BackButton.show();
+        WebApp.BackButton.onClick(onBack);
+
+        const checkScrollable = () => {
+            if (headerRef.current) {
+                const isContentOverflowing = headerRef.current.scrollWidth > headerRef.current.clientWidth;
+                const isSmallScreen = window.innerWidth < 768;
+                setIsScrollable(isContentOverflowing && isSmallScreen);
+            }
+        };
+
+        checkScrollable();
+        window.addEventListener('resize', checkScrollable);
+
+        return () => {
+            WebApp.BackButton.offClick(onBack);
+            WebApp.BackButton.hide();
+            window.removeEventListener('resize', checkScrollable);
+        };
+    }, [address, onBack]);
 
     const handleCopy = async () => {
         if (data?.tokenAddress) {
@@ -62,51 +80,60 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
 
     return (
         <div className="flex flex-col h-full">
-            <div className="flex items-center justify-between gap-4 p-4 border-b border-gray-800">
-                <div className="flex items-center gap-4">
-                    <ArrowLeft onClick={onBack} className="h-8 w-8 cursor-pointer" />
-                    <img
-                        src={data.icon ?? "/images/missing.png"}
-                        alt=""
-                        className="w-8 h-8 rounded-full"
-                    />
-                    <h2 className="lg:text-xl text-base font-bold flex items-center gap-3">
-                        {data.name.slice(0, 6)}
-                        <button
-                            onClick={handleCopy}
-                            className="p-0 text-gray-400 hover:text-white transition-colors"
-                            title="Copy token address"
-                        >
-                            {isCopied ? (
-                                <Check className="w-4 h-4 text-green-500" />
-                            ) : (
-                                <Copy className="w-4 h-4" />
-                            )}
-                        </button>
-                    </h2>
-                </div>
-                <div className="flex lg:gap-8 gap-3">
-                    <div className="text-left">
-                        <div className="lg:text-sm text-xs font-light text-gray-400">Market price</div>
-                        <div className="flex items-center">
-                            <span className="lg:text-lg font-semibold text-xs">{data.price}$</span>
-                            <span className={`ml-2 lg:text-sm text-xs ${raw_percentage > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                {formatted_percentage}
-                            </span>
+            <div className="relative border-b border-gray-800">
+                <div
+                    ref={headerRef}
+                    className={`flex items-center justify-between p-4 ${isScrollable ? 'overflow-x-auto scrollbar-hide' : ''}`}
+                >
+                    <div className="flex items-center gap-4 flex-shrink-0">
+                        <img
+                            src={data.icon ?? "/images/missing.png"}
+                            alt=""
+                            className="w-8 h-8 rounded-full"
+                        />
+                        <h2 className="text-base font-bold flex items-center gap-3">
+                            {data.name}
+                            <button
+                                onClick={handleCopy}
+                                className="p-0 text-gray-400 hover:text-white transition-colors"
+                                title="Copy token address"
+                            >
+                                {isCopied ? (
+                                    <Check className="w-4 h-4 text-green-500" />
+                                ) : (
+                                    <Copy className="w-4 h-4" />
+                                )}
+                            </button>
+                        </h2>
+                    </div>
+                    <div className={`flex gap-8 ${isScrollable ? 'flex-shrink-0' : ''}`}>
+                        <div className="text-left">
+                            <div className="text-sm font-light text-gray-400">Market price</div>
+                            <div className="flex items-center">
+                                <span className="text-lg font-semibold">{data.price}$</span>
+                                <span className={`ml-2 text-sm ${raw_percentage > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                    {formatted_percentage}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="text-left">
+                            <div className="text-sm font-light text-gray-400">Market cap</div>
+                            <div className="text-lg font-semibold">${data.marketCap.toLocaleString()}</div>
                         </div>
                     </div>
-                    <div className="text-left">
-                        <div className="lg:text-lg text-xs font-light text-gray-400">Market cap</div>
-                        <div className="lg:text-lg text-xs font-semibold">${data.marketCap.toLocaleString()}</div>
-                    </div>
                 </div>
+                {isScrollable && (
+                    <div className="absolute right-0 top-0 bottom-0 flex items-center bg-gradient-to-l from-[#0a0a0a] via-[#0a0a0a] to-transparent px-2">
+                        <ChevronRight className="w-4 h-4 text-gray-400" />
+                    </div>
+                )}
             </div>
 
             <div className="mx-5 my-2">
                 <DexScreenerEmbed tokenAddress={data.poolAddress} />
             </div>
 
-            <div className="flex justify-between gap-4 p-4">
+            <div className="flex justify-between gap-3 p-4">
                 <button
                     className="w-1/2 bg-[#14AE5C] text-white font-semibold text-center py-3 rounded"
                     onClick={() => setIsBuyModalOpen(true)}
@@ -144,3 +171,4 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
         </div>
     );
 }
+
