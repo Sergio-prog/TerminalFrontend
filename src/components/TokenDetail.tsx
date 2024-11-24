@@ -173,7 +173,7 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
                 <DexScreenerEmbed tokenAddress={data.poolAddress} />
             </div>
 
-            <div className="flex justify-between gap-3 p-4">
+            <div className="flex justify-between gap-3 p-4 pb-0">
                 <button
                     className="w-1/2 bg-[#14AE5C] text-white font-semibold text-center py-3 rounded"
                     onClick={() => setIsBuyModalOpen(true)}
@@ -188,11 +188,11 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
                 </button>
             </div>
 
-            <BuyModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} />
-            <SellModal isOpen={isSellModalOpen} onClose={() => setIsSellModalOpen(false)} />
+            <BuyModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} pairSymbol={data.name} />
+            <SellModal isOpen={isSellModalOpen} onClose={() => setIsSellModalOpen(false)} pairSymbol={data.name} />
 
             <div className="flex-1 overflow-auto">
-                <div className="p-4 space-y-4">
+                <div className="p-4 pt-0 space-y-4">
                     <div className="mt-6">
                         <div className="rounded-lg overflow-hidden">
                             <PriceChangeTabs

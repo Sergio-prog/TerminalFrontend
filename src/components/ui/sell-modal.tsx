@@ -7,12 +7,13 @@ import { ConnectButton } from '../ConnectButton'
 interface SellModalProps {
   isOpen: boolean;
   onClose: () => void;
+  pairSymbol: string;
 }
 
 type OrderType = 'Market' | 'Limit';
 type LimitType = 'MC is' | 'Price';
 
-export function SellModal({ isOpen, onClose }: SellModalProps) {
+export function SellModal({ isOpen, onClose, pairSymbol }: SellModalProps) {
   const [tonConnectUI] = useTonConnectUI();
   const isWalletConnected = tonConnectUI.connected;
   const [tonBalance] = useState(5.77)
@@ -78,7 +79,7 @@ export function SellModal({ isOpen, onClose }: SellModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Sell Token</h2>
+          <h2 className="text-xl font-semibold">Sell {pairSymbol}</h2>
           <button onClick={onClose} className="text-neutral-400 hover:text-white">
             <X className="h-6 w-6" />
           </button>
@@ -142,7 +143,7 @@ export function SellModal({ isOpen, onClose }: SellModalProps) {
         <div className={cn("flex justify-between items-center p-3 rounded-md", "bg-neutral-800")}>
           <div className="flex items-center gap-2">
             <img src="/images/ton_logo.png" alt="TON Logo" className="w-6 h-6" />
-            <span>TON</span>
+            <span>{pairSymbol}</span>
           </div>
           <input
             type="text"
@@ -184,8 +185,8 @@ export function SellModal({ isOpen, onClose }: SellModalProps) {
         <div className="space-y-3">
           {[
             { label: "Entry price", value: "0.0234 USD" },
-            { label: "Position size", value: "0 DOGS" },
-            { label: "Slippage", value: "2%" },
+            { label: "Position size", value: `0 ${pairSymbol}` },
+            { label: "Slippage", value: "10%" },
           ].map(({ label, value }) => (
             <div key={label} className="flex justify-between text-sm">
               <span className="text-neutral-400">{label}</span>
@@ -198,10 +199,11 @@ export function SellModal({ isOpen, onClose }: SellModalProps) {
           <ConnectButton className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 rounded-md text-lg" />
         ) : (
           <button className="w-full bg-[#FF7373] hover:bg-[#ff5959] text-white font-bold py-2.5 rounded-md text-lg">
-            SELL
+            SELL {pairSymbol}
           </button>
         )}
       </div>
     </div>
   )
 }
+

@@ -7,12 +7,13 @@ import { ConnectButton } from '../ConnectButton'
 interface BuyModalProps {
   isOpen: boolean;
   onClose: () => void;
+  pairSymbol: string;
 }
 
 type OrderType = 'Market' | 'Limit';
 type LimitType = 'MC is' | 'Price';
 
-export function BuyModal({ isOpen, onClose }: BuyModalProps) {
+export function BuyModal({ isOpen, onClose, pairSymbol }: BuyModalProps) {
   const [tonConnectUI] = useTonConnectUI();
   const isWalletConnected = tonConnectUI.connected;
   const [tonBalance] = useState(5.77)
@@ -78,7 +79,7 @@ export function BuyModal({ isOpen, onClose }: BuyModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Buy Token</h2>
+          <h2 className="text-xl font-semibold">Buy {pairSymbol}</h2>
           <button onClick={onClose} className="text-neutral-400 hover:text-white">
             <X className="h-6 w-6" />
           </button>
@@ -139,11 +140,10 @@ export function BuyModal({ isOpen, onClose }: BuyModalProps) {
           </div>
         )}
 
-
         <div className={cn("flex justify-between items-center p-3 rounded-md", "bg-neutral-800")}>
           <div className="flex items-center gap-2">
             <img src="/images/ton_logo.png" alt="TON Logo" className="w-6 h-6" />
-            <span>TON</span>
+            <span>{pairSymbol}</span>
           </div>
           <input
             type="text"
@@ -161,21 +161,6 @@ export function BuyModal({ isOpen, onClose }: BuyModalProps) {
             pattern="[0-9]*"
           />
         </div>
-
-        {/* <div className={cn("flex justify-between items-center p-3 rounded-md", "bg-neutral-800")}>
-          <div className="flex items-center gap-2">
-            <img src="/images/ton_logo.png" alt="TON Logo" className="w-6 h-6" />
-            <span>TON</span>
-          </div>
-          <input
-            type="number"
-            value={tonAmount}
-            onChange={(e) => isWalletConnected && setTonAmount(Number(e.target.value))}
-            className="bg-transparent text-right w-24 focus:outline-none"
-            placeholder="Amount"
-            disabled={!isWalletConnected}
-          />
-        </div> */}
 
         <div className="flex justify-between gap-2">
           {[25, 50, 75, 100].map((percentage) => (
@@ -200,8 +185,8 @@ export function BuyModal({ isOpen, onClose }: BuyModalProps) {
         <div className="space-y-3">
           {[
             { label: "Entry price", value: "0.0234 USD" },
-            { label: "Position size", value: "0 DOGS" },
-            { label: "Slippage", value: "2%" },
+            { label: "Position size", value: `0 ${pairSymbol}` },
+            { label: "Slippage", value: "10%" },
           ].map(({ label, value }) => (
             <div key={label} className="flex justify-between text-sm">
               <span className="text-neutral-400">{label}</span>
@@ -214,7 +199,7 @@ export function BuyModal({ isOpen, onClose }: BuyModalProps) {
           <ConnectButton className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 rounded-md text-lg" />
         ) : (
           <button className="w-full bg-[#14AE5C] hover:bg-[#119a4f] text-white font-bold py-2.5 rounded-md text-lg">
-            BUY
+            BUY {pairSymbol}
           </button>
         )}
       </div>
