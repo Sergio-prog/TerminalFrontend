@@ -1,7 +1,7 @@
 'use client'
 
 import logo from '../../public/images/logo.svg';
-import { useCallback, useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { toUserFriendlyAddress, useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
 import { TokenDetail } from '../components/TokenDetail';
 import { Button } from '../components/ui/button';
@@ -128,7 +128,7 @@ function shortenAddress(address: string, startLength = 4, endLength = 4): string
 
 export default function TelegramMiniApp() {
   const [selectedPairAddress, setSelectedPairAddress] = useState<string | null>(null);
-  const [signedMessage, setSignedMessage] = useState<string | null>(null);
+  const [signedMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'pairs' | 'positions'>('pairs');
   const [pairs, setPairs] = useState<NewPair[]>([]);
   const [originalPairs, setOriginalPairs] = useState<NewPair[]>([]);
