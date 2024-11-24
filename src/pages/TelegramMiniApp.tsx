@@ -159,26 +159,26 @@ export default function TelegramMiniApp() {
     loadPairs();
   }, []);
 
-  const handleSignMessage = useCallback(async () => {
-    if (!connected) return;
+  // const handleSignMessage = useCallback(async () => {
+  //   if (!connected) return;
 
-    const message = 'Welcome to TerminalX!';
-    try {
-      const result = await tonConnectUi.sendTransaction({
-        validUntil: Math.floor(Date.now() / 1000) + 60,
-        messages: [
-          {
-            address: '0:8c397c43f9ff0b49659b5d0a302b1a93af7ccc63e5f5c0c4f25a9dc1f8b47ab3',
-            amount: '1',
-            payload: Buffer.from(message).toString('hex'),
-          },
-        ],
-      });
-      setSignedMessage(result.boc);
-    } catch (error) {
-      console.error('Error signing message:', error);
-    }
-  }, [connected, tonConnectUi]);
+  //   const message = 'Welcome to TerminalX!';
+  //   try {
+  //     const result = await tonConnectUi.sendTransaction({
+  //       validUntil: Math.floor(Date.now() / 1000) + 60,
+  //       messages: [
+  //         {
+  //           address: '0:8c397c43f9ff0b49659b5d0a302b1a93af7ccc63e5f5c0c4f25a9dc1f8b47ab3',
+  //           amount: '1',
+  //           payload: Buffer.from(message).toString('hex'),
+  //         },
+  //       ],
+  //     });
+  //     setSignedMessage(result.boc);
+  //   } catch (error) {
+  //     console.error('Error signing message:', error);
+  //   }
+  // }, [connected, tonConnectUi]);
 
   const handleSearch = async () => {
     if (searchTerm.trim()) {
@@ -309,4 +309,3 @@ export default function TelegramMiniApp() {
     </div>
   );
 }
-
