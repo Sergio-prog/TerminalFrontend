@@ -48,6 +48,12 @@ export interface PairDetail {
   };
 }
 
+export interface NewUserWallet {
+  address: string;
+  mnemonic: string;
+  public_key: string;
+}
+
 export async function fetchNewPairs(): Promise<NewPair[]> {
   try {
     const response = await fetch(`${API_BASE_URL}/pairs/trending/`);
@@ -75,6 +81,27 @@ export async function fetchNewPairs(): Promise<NewPair[]> {
   } catch (error) {
     console.error('Error fetching new pairs:', error);
     throw error;
+  }
+}
+
+export async function signUp(address: string, message: string, proof: string): Promise<NewUserWallet> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/signup/`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ address, message, signature: proof })
+      }
+    );
+    if (!response.ok) throw new Error('Failed to signUp user');
+    const data: NewUserWallet = await response.json();
+    console.log(data);
+
+    return data;
+  } catch (error) {
+    console.error('Error:', error)
   }
 }
 
