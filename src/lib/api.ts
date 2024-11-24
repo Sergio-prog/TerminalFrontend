@@ -76,10 +76,8 @@ export async function fetchNewPairs(): Promise<NewPair[]> {
         name: item.attributes.name,
         symbol: item.attributes.symbol,
       },
-      links: [],
     }));
   } catch (error) {
-    console.error('Error fetching new pairs:', error);
     throw error;
   }
 }
@@ -110,7 +108,6 @@ export async function fetchPairDetail(address: string): Promise<PairDetail> {
     const response = await fetch(`${API_BASE_URL}/pairs/${address}`);
     if (!response.ok) throw new Error('Failed to fetch token details');
     const data: PairDetail = await response.json();
-    console.log(data);
 
     return mapPairDetailToTokenDetail(data);
   } catch (error) {
@@ -122,9 +119,8 @@ export async function fetchPairDetail(address: string): Promise<PairDetail> {
 export function mapPairDetailToTokenDetail(data: any): PairDetail {
   const timeRanges: TimeRange[] = ['m5', 'h1', 'h6', 'h24'];
 
-  console.log("assd", data.attributes?.image_url, data.info?.imageUrl, data.attributes)
   return {
-    name: data.base_token.name,
+    name: data.base_token.symbol,
     tokenAddress: data.base_token.address,
     icon: data.attributes?.image_url || data.info?.imageUrl,
     symbol: data.attributes?.symbol,
@@ -149,4 +145,31 @@ export function mapPairDetailToTokenDetail(data: any): PairDetail {
       return acc;
     }, {} as PairDetail['price_change'])
   };
+}
+
+export async function getPairBySearch(searchTerm: string): Promise<NewPair[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/pairs/?search=${encodeURIComponent(searchTerm)}`);
+    if (!response.ok) throw new Error('Failed to fetch search results');
+    const data = await response.json();
+
+    return data.results.map((item: any) => ({
+      url: item.url,
+      chainId: item.chain_id,
+      tokenAddress: item.pair_address,
+      icon: item.info?.imageUrl || '/images/missing.png',
+      header: item.base_token.name,
+      symbol: item.base_token.symbol,
+      marketCap: item.market_cap || null,
+      volume: item.volume.h24 || 0,
+      baseToken: {
+        address: item.base_token.address,
+        name: item.base_token.name,
+        symbol: item.base_token.symbol,
+      }
+    }));
+  } catch (error) {
+    console.error('Error fetching search results:', error);
+    throw error;
+  }
 }

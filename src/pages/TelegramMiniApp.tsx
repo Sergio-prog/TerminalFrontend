@@ -6,34 +6,21 @@ import { toUserFriendlyAddress, useTonConnectUI, useTonWallet } from '@tonconnec
 import { TokenDetail } from '../components/TokenDetail';
 import { Button } from '../components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
-import { Search, LogOut } from 'lucide-react';
+import { Search, LogOut, X } from 'lucide-react';
 import WebApp from '@twa-dev/sdk';
-import { fetchNewPairs, NewPair, signUp } from '../lib/api';
+import { fetchNewPairs, NewPair, getPairBySearch, signUp } from '../lib/api';
 import { ConnectButton } from '../components/ConnectButton';
 import { randomBytes } from 'crypto';
 import { decodeJwt, JWTPayload, jwtVerify, SignJWT } from 'jose';
 import useInterval from '../hooks/useInterval';
+import { Input } from '../components/ui/input';
 
-
-function TradingPairsList({ onSelectPair }: { onSelectPair: (id: string) => void }) {
-  const [pairs, setPairs] = useState<NewPair[]>([]);
+function TradingPairsList({ onSelectPair, pairs }: { onSelectPair: (pairAddress: string) => void, pairs: NewPair[] }) {
   const [page, setPage] = useState(1);
   const itemsPerPage = 12;
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const displayedPairs = pairs.slice(startIndex, endIndex);
-
-  useEffect(() => {
-    async function loadPairs() {
-      try {
-        const newPairs = await fetchNewPairs();
-        setPairs(newPairs);
-      } catch (error) {
-        console.error('Error loading pairs:', error);
-      }
-    }
-    loadPairs();
-  }, []);
 
   return (
     <>
@@ -163,9 +150,14 @@ export type PayloadToken = {
 const createPayloadToken = buildCreateToken<PayloadToken>('15m');
 
 export default function TelegramMiniApp() {
-  const [selectedPairId, setSelectedPairId] = useState<string | null>(null);
-  const [signedMessage, setSignedMessage] = useState<string | null>(null);
+  const [selectedPairAddress, setSelectedPairAddress] = useState<string | null>(null);
+  const [signedMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'pairs' | 'positions'>('pairs');
+  const [pairs, setPairs] = useState<NewPair[]>([]);
+  const [originalPairs, setOriginalPairs] = useState<NewPair[]>([]);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const connected = useTonWallet();
   const [authorized, setAuthorized] = useState(false);
@@ -252,75 +244,131 @@ export default function TelegramMiniApp() {
       setAuthorized(true);
     }), [tonConnectUi]);
 
-  useCallback(async () => {
-    if (!connected) return;
-
-    const message = 'Welcome to TerminalX!';
-    try {
-      const result = await tonConnectUi.sendTransaction({
-        validUntil: Math.floor(Date.now() / 1000) + 60,
-        messages: [
-          {
-            address: '0:8c397c43f9ff0b49659b5d0a302b1a93af7ccc63e5f5c0c4f25a9dc1f8b47ab3',
-            amount: '1',
-            payload: Buffer.from(message).toString('hex'),
-          },
-        ],
-      });
-      setSignedMessage(result.boc);
-    } catch (error) {
-      console.error('Error signing message:', error);
-    }
-  }, [connected]);
-
   useEffect(() => {
-    WebApp.setHeaderColor('#0a0a0a');
-    WebApp.expand();
-    WebApp.ready();
+    async function loadPairs() {
+      try {
+        const newPairs = await fetchNewPairs();
+        setPairs(newPairs);
+        setOriginalPairs(newPairs);
+      } catch (error) {
+        console.error('Error loading pairs:', error);
+      }
+    }
+    loadPairs();
   }, []);
+
+  // const handleSignMessage = useCallback(async () => {
+  //   if (!connected) return;
+
+  //   const message = 'Welcome to TerminalX!';
+  //   try {
+  //     const result = await tonConnectUi.sendTransaction({
+  //       validUntil: Math.floor(Date.now() / 1000) + 60,
+  //       messages: [
+  //         {
+  //           address: '0:8c397c43f9ff0b49659b5d0a302b1a93af7ccc63e5f5c0c4f25a9dc1f8b47ab3',
+  //           amount: '1',
+  //           payload: Buffer.from(message).toString('hex'),
+  //         },
+  //       ],
+  //     });
+  //     setSignedMessage(result.boc);
+  //   } catch (error) {
+  //     console.error('Error signing message:', error);
+  //   }
+  // }, [connected, tonConnectUi]);
+
+  const handleSearch = async () => {
+    if (searchTerm.trim()) {
+      try {
+        const searchResults = await getPairBySearch(searchTerm);
+        setPairs(searchResults);
+      } catch (error) {
+        console.error('Error searching pairs:', error);
+      }
+    } else {
+      setPairs(originalPairs);
+    }
+  };
+
+  const toggleSearch = () => {
+    setIsSearchOpen(!isSearchOpen);
+    if (!isSearchOpen) {
+      setTimeout(() => searchInputRef.current?.focus(), 0);
+    } else {
+      setSearchTerm('');
+      setPairs(originalPairs);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-[#0a0a0a] text-white">
       <div className="flex items-center justify-between p-4 border-b border-gray-800">
-        <div
-          onClick={() => (window.location.href = '/')}
-          className="flex items-center gap-2 cursor-pointer"
-          title="Go to trending page"
-        >
-          <img src={logo} alt="Logo" className="w-[25px] h-[25px]" />
-          <h1 className="text-lg font-semibold">TerminalX</h1>
-        </div>
-        <div className="flex gap-2">
-          <Button size="icon" variant="ghost" className="text-blue-500 hover:bg-gray-800">
-            <Search className="h-5 w-5" />
-          </Button>
-          {connected ? (
-            <>
-              <CopyableAddressButton address={wallet?.address} />
+        {isSearchOpen ? (
+          <div className="flex items-center w-full">
+            <Input
+              ref={searchInputRef}
+              type="text"
+              placeholder="Search pairs..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              className="flex-grow bg-transparent border-none focus:ring-0 text-white"
+            />
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={toggleSearch}
+              className="text-gray-400 hover:text-white ml-2"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+        ) : (
+          <>
+            <div
+              onClick={() => (window.location.href = '/')}
+              className="flex items-center gap-2 cursor-pointer"
+              title="Go to trending page"
+            >
+              <img src={logo} alt="Logo" className="w-[25px] h-[25px]" />
+              <h1 className="text-lg font-semibold">TerminalX</h1>
+            </div>
+            <div className="flex gap-2 items-center">
               <Button
                 size="icon"
                 variant="ghost"
+                onClick={toggleSearch}
                 className="text-blue-500 hover:bg-gray-800"
-                onClick={async () => {
-                  try {
-                    await tonConnectUi.disconnect();
-                  } catch (error) {
-                    console.error('Error:', error);
-                  }
-                }}
-                title="Logout"
               >
-                <LogOut className="h-5 w-5" />
+                <Search className="h-5 w-5" />
               </Button>
-            </>
-          ) : (
-            <ConnectButton />
-          )}
-        </div>
+              {connected ? (
+                <>
+                  <CopyableAddressButton address={wallet?.address} />
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="text-blue-500 hover:bg-gray-800"
+                    onClick={async () => {
+                      try {
+                        await tonConnectUi.disconnect();
+                      } catch (error) {
+                        console.error('Error:', error);
+                      }
+                    }}
+                    title="Logout"
+                  >
+                    <LogOut className="h-5 w-5" />
+                  </Button>
+                </>
+              ) : (
+                <ConnectButton />
+              )}
+            </div>
+          </>
+        )}
       </div>
-
-
-
 
       <div className="flex gap-4 p-4 border-b border-gray-800">
         <p
@@ -346,10 +394,10 @@ export default function TelegramMiniApp() {
       )}
 
       {activeTab === 'pairs' ? (
-        selectedPairId ? (
-          <TokenDetail address={selectedPairId} onBack={() => setSelectedPairId(null)} />
+        selectedPairAddress ? (
+          <TokenDetail address={selectedPairAddress} onBack={() => setSelectedPairAddress(null)} />
         ) : (
-          <TradingPairsList onSelectPair={setSelectedPairId} />
+          <TradingPairsList onSelectPair={setSelectedPairAddress} pairs={pairs} />
         )
       ) : (
         <div className="p-4">
