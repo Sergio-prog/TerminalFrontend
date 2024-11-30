@@ -276,10 +276,17 @@ export default function TelegramMiniApp() {
         <p
           className={`text-white cursor-pointer ${activeTab === 'pairs' ? 'border-b-2 border-blue-500' : 'hover:bg-gray-800'
             }`}
-          onClick={() => setActiveTab('pairs')}
+          onClick={() => {
+            setActiveTab('pairs');
+            if (selectedPairAddress) {
+              setSelectedPairAddress(null);
+              window.history.pushState(null, '', '/');
+            }
+          }}
         >
           Pairs
         </p>
+
         <p
           className={`text-white cursor-pointer ${activeTab === 'positions' ? 'border-b-2 border-blue-500' : 'hover:bg-gray-800'
             }`}

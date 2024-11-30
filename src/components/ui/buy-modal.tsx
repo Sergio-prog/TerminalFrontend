@@ -8,12 +8,13 @@ interface BuyModalProps {
   isOpen: boolean;
   onClose: () => void;
   pairSymbol: string;
+  pairPrice: number;
 }
 
 type OrderType = 'Market' | 'Limit';
 type LimitType = 'MC is' | 'Price';
 
-export function BuyModal({ isOpen, onClose, pairSymbol }: BuyModalProps) {
+export function BuyModal({ isOpen, onClose, pairSymbol, pairPrice }: BuyModalProps) {
   const [tonConnectUI] = useTonConnectUI();
   const isWalletConnected = tonConnectUI.connected;
   const [tonBalance] = useState(5.77)
@@ -143,7 +144,7 @@ export function BuyModal({ isOpen, onClose, pairSymbol }: BuyModalProps) {
         <div className={cn("flex justify-between items-center p-3 rounded-md", "bg-neutral-800")}>
           <div className="flex items-center gap-2">
             <img src="/images/ton_logo.png" alt="TON Logo" className="w-6 h-6" />
-            <span>{pairSymbol}</span>
+            <span>TON</span>
           </div>
           <input
             type="text"
@@ -184,7 +185,7 @@ export function BuyModal({ isOpen, onClose, pairSymbol }: BuyModalProps) {
 
         <div className="space-y-3">
           {[
-            { label: "Entry price", value: "0.0234 USD" },
+            { label: "Entry price", value: `${pairPrice}$` },
             { label: "Position size", value: `0 ${pairSymbol}` },
             { label: "Slippage", value: "10%" },
           ].map(({ label, value }) => (
@@ -199,7 +200,7 @@ export function BuyModal({ isOpen, onClose, pairSymbol }: BuyModalProps) {
           <ConnectButton className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 rounded-md text-lg" />
         ) : (
           <button className="w-full bg-[#14AE5C] hover:bg-[#119a4f] text-white font-bold py-2.5 rounded-md text-lg">
-            BUY {pairSymbol}
+            BUY
           </button>
         )}
       </div>

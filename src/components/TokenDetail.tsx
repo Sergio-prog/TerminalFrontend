@@ -188,8 +188,8 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
                 </button>
             </div>
 
-            <BuyModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} pairSymbol={data.name} />
-            <SellModal isOpen={isSellModalOpen} onClose={() => setIsSellModalOpen(false)} pairSymbol={data.name} />
+            <BuyModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} pairSymbol={data.name} pairPrice={data.price} />
+            <SellModal isOpen={isSellModalOpen} onClose={() => setIsSellModalOpen(false)} pairSymbol={data.name} pairPrice={data.price} />
 
             <div className="flex-1 overflow-auto">
                 <div className="p-4 pt-0 space-y-4">
