@@ -135,9 +135,9 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
                     </div>
                     <div className="flex gap-8 flex-shrink-0">
                         <div className="text-left">
-                            <div className="text-sm font-light text-gray-400">Market price</div>
+                            <div className="text-sm font-light text-gray-400">Market price (TON)</div>
                             <div className="flex items-center">
-                                <span className="text-lg font-semibold">{data.price}$</span>
+                                <span className="text-lg font-semibold">{data.price_ton} TON</span>
                                 <span className={`ml-2 text-sm ${raw_percentage > 0 ? 'text-green-500' : 'text-red-500'}`}>
                                     {formatted_percentage}
                                 </span>
@@ -188,8 +188,8 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
                 </button>
             </div>
 
-            <BuyModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} pairSymbol={data.name} pairPrice={data.price} />
-            <SellModal isOpen={isSellModalOpen} onClose={() => setIsSellModalOpen(false)} pairSymbol={data.name} pairPrice={data.price} />
+            <BuyModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} pairSymbol={data.name} pairPrice={data.price_ton} />
+            <SellModal isOpen={isSellModalOpen} onClose={() => setIsSellModalOpen(false)} pairSymbol={data.name} pairPrice={data.price_ton} />
 
             <div className="flex-1 overflow-auto">
                 <div className="p-4 pt-0 space-y-4">

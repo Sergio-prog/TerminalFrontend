@@ -185,8 +185,8 @@ export function SellModal({ isOpen, onClose, pairSymbol, pairPrice }: SellModalP
 
         <div className="space-y-3">
           {[
-            { label: "Entry price", value: `${pairPrice}$`},
-            { label: "Position size", value: `0 ${pairSymbol}` },
+            { label: "Entry price", value: `${pairPrice} TON`},
+            { label: "Position size", value: `${(tonAmount / pairPrice).toFixed(2)} ${pairSymbol}` },
             { label: "Slippage", value: "10%" },
           ].map(({ label, value }) => (
             <div key={label} className="flex justify-between text-sm">

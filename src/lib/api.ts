@@ -1,4 +1,5 @@
-const API_BASE_URL = 'https://secret-ocean-19070-7d15bdda8dde.herokuapp.com/api';
+// const API_BASE_URL = 'https://secret-ocean-19070-7d15bdda8dde.herokuapp.com/api';
+const API_BASE_URL = 'http://0.0.0.0:8000/api';
 export type TimeRange = 'm5' | 'h1' | 'h6' | 'h24';
 
 export interface NewPair {
@@ -29,7 +30,8 @@ export interface PairDetail {
   tokenAddress: string;
   symbol: string;
   icon: string;
-  price: number;
+  price_ton: number;
+  price_usd: number;
   change24h: number;
   marketCap: number;
   supply: number;
@@ -97,7 +99,8 @@ export function mapPairDetailToTokenDetail(data: any): PairDetail {
     tokenAddress: data.base_token.address,
     icon: data.attributes?.image_url || data.info?.imageUrl,
     symbol: data.attributes?.symbol,
-    price: data.price_usd,
+    price_ton: data.price_native,
+    price_usd: data.price_usd,
     change24h: data.price_change.h24,
     marketCap: data.market_cap || 0,
     supply: data.liquidity.base || 0,
