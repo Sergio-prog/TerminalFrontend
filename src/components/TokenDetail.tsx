@@ -135,9 +135,18 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
                     </div>
                     <div className="flex gap-8 flex-shrink-0">
                         <div className="text-left">
-                            <div className="text-sm font-light text-gray-400">Market price (TON)</div>
+                            <div className="text-sm font-light text-gray-400">Price</div>
                             <div className="flex items-center">
                                 <span className="text-lg font-semibold">{data.price_ton} TON</span>
+                                <span className={`ml-2 text-sm ${raw_percentage > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                    {formatted_percentage}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="text-left">
+                            <div className="text-sm font-light text-gray-400">Price USD</div>
+                            <div className="flex items-center">
+                                <span className="text-lg font-semibold">${data.price_usd}</span>
                                 <span className={`ml-2 text-sm ${raw_percentage > 0 ? 'text-green-500' : 'text-red-500'}`}>
                                     {formatted_percentage}
                                 </span>
