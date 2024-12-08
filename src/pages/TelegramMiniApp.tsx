@@ -248,74 +248,84 @@ export default function TelegramMiniApp() {
     }
   };
 
+  const goToTrendingPage = () => {
+    setSelectedPairAddress(null);
+    setActiveTab('pairs');
+  };
+
   return (
-    <div className="flex flex-col min-h-screen bg-[#0a0a0a] text-white">
-      <div className="flex items-center justify-between p-4 border-b border-gray-800">
-        {isSearchOpen ? (
-          <div className="flex items-center w-full">
-            <Input
-              ref={searchInputRef}
-              type="text"
-              placeholder="Search pairs..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              className="flex-grow bg-transparent border-none focus:ring-0 text-white"
-            />
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={toggleSearch}
-              className="text-gray-400 hover:text-white ml-2"
-            >
-              <X className="h-5 w-5" />
-            </Button>
-          </div>
-        ) : (
-          <>
-            <div
-              onClick={() => (window.location.href = '/')}
-              className="flex items-center gap-2 cursor-pointer"
-              title="Go to trending page"
-            >
-              <img src={logo} alt="Logo" className="w-[25px] h-[25px]" />
-              <h1 className="text-lg font-semibold">TerminalX</h1>
-            </div>
-            <div className="flex gap-2 items-center">
+    <div className="relative flex flex-col min-h-screen bg-[#0a0a0a] text-white overflow-hidden">
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <div className="absolute -left-1/2 -top-1/4 w-full h-[150%] bg-green-500/10 rounded-[100%] filter blur-[100px] transform -rotate-12"></div>
+        <div className="absolute -right-1/2 -top-1/4 w-full h-[150%] bg-gray-800/35 rounded-[100%] filter blur-[100px] transform rotate-12"></div>
+      </div>
+      <div className="relative z-10 flex flex-col min-h-screen">
+        <div className="flex items-center justify-between p-6 border-b border-gray-800">
+          {isSearchOpen ? (
+            <div className="flex items-center w-full">
+              <Input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Search pairs..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                className="flex-grow bg-transparent border-none focus:ring-0 text-white"
+              />
               <Button
                 size="icon"
                 variant="ghost"
                 onClick={toggleSearch}
-                className="text-blue-500 hover:bg-gray-800"
+                className="text-gray-400 hover:text-white ml-2"
               >
-                <Search className="h-5 w-5" />
+                <X className="h-5 w-5" />
               </Button>
-              {connected ? (
-                <>
-                  <CopyableAddressButton address={wallet?.address} />
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="text-blue-500 hover:bg-gray-800"
-                    onClick={async () => {
-                      try {
-                        await tonConnectUi.disconnect();
-                      } catch (error) {
-                        console.error('Error:', error);
-                      }
-                    }}
-                    title="Logout"
-                  >
-                    <LogOut className="h-5 w-5" />
-                  </Button>
-                </>
-              ) : (
-                <ConnectButton />
-              )}
             </div>
-          </>
-        )}
-      </div>
+          ) : (
+            <>
+              <div
+                onClick={goToTrendingPage}
+                className="flex items-center gap-2 cursor-pointer"
+                title="Go to trending page"
+              >
+                <img src={logo} alt="Logo" width={25} height={25} />
+                <h1 className="text-lg font-semibold">TerminalX</h1>
+              </div>
+              <div className="flex gap-2 items-center">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={toggleSearch}
+                  className="text-blue-500 hover:bg-gray-800"
+                >
+                  <Search className="h-5 w-5" />
+                </Button>
+                {connected ? (
+                  <>
+                    <CopyableAddressButton address={wallet?.address} />
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="text-blue-500 hover:bg-gray-800"
+                      onClick={async () => {
+                        try {
+                          await tonConnectUi.disconnect();
+                        } catch (error) {
+                          console.error('Error:', error);
+                        }
+                      }}
+                      title="Logout"
+                    >
+                      <LogOut className="h-5 w-5" />
+                    </Button>
+                  </>
+                ) : (
+                  <ConnectButton />
+                )}
+              </div>
+            </>
+          )}
+        </div>
 
       <div className="flex gap-4 p-4 border-b border-gray-800">
         <p
@@ -362,6 +372,7 @@ export default function TelegramMiniApp() {
           )}
         </div>
       )}
+    </div>
     </div>
   );
 }
