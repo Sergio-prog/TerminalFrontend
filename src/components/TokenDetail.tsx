@@ -218,7 +218,7 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
                     </div>
                 </div>
             </div>
-            <div className="mt-6">
+            <div className="mt-2.5">
                 <HistoryAndOrdersTabs />
             </div>
         </div>

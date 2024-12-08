@@ -17,7 +17,6 @@
     "@ton/ton": "^15.1.0",
     "@tonconnect/ui-react": "^2.0.9",
     "@twa-dev/sdk": "^7.10.1",
-    "@types/three": "^0.170.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.456.0",
@@ -27,7 +26,6 @@
     "react-router-dom": "^6.28.0",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
-    "three": "^0.171.0",
     "tonweb": "^0.0.66",
     "ui": "github:shadcn/ui",
     "vite-plugin-node-polyfills": "^0.22.0"
