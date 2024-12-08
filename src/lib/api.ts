@@ -49,6 +49,22 @@ export interface PairDetail {
   };
 }
 
+export interface Position {
+  id: string;
+  base_token: string;
+  quote_token: string;
+  base_token_address: string;
+  quote_token_address: string;
+  created_at_price: number;
+  created_at_native_price: number;
+  sold_price: number;
+  sold_native_price: number;
+  user: string;
+  pair_address: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export async function fetchNewPairs(): Promise<NewPair[]> {
   try {
     const response = await fetch(`${API_BASE_URL}/pairs/trending/`);
@@ -145,6 +161,18 @@ export async function getPairBySearch(searchTerm: string): Promise<NewPair[]> {
     }));
   } catch (error) {
     console.error('Error fetching search results:', error);
+    throw error;
+  }
+}
+
+export async function fetchPositions(): Promise<Position[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/positions/`);
+    if (!response.ok) throw new Error('Failed to fetch positions');
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching positions:', error);
     throw error;
   }
 }

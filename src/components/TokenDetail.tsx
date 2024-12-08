@@ -5,6 +5,7 @@ import { SellModal } from './ui/sell-modal';
 import { fetchPairDetail, PairDetail } from '../lib/api';
 import DexScreenerEmbed from './DexScreenerEmbed';
 import { PriceChangeTabs } from './ui/price-change-tabs';
+import { HistoryAndOrdersTabs } from './ui/history_and_orders_tabs';
 import { VolumeIndicator } from '../components/ui/volume-indicator';
 import WebApp from '@twa-dev/sdk'
 
@@ -216,6 +217,9 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
                         </div>
                     </div>
                 </div>
+            </div>
+            <div className="mt-6">
+                <HistoryAndOrdersTabs />
             </div>
         </div>
     );

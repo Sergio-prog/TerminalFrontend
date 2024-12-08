@@ -8,7 +8,7 @@ import { Button } from '../components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { Search, LogOut, X } from 'lucide-react';
 import WebApp from '@twa-dev/sdk';
-import { fetchNewPairs, NewPair, getPairBySearch } from '../lib/api';
+import { fetchNewPairs, NewPair, getPairBySearch, fetchPositions, Position } from '../lib/api';
 import { ConnectButton } from '../components/ConnectButton';
 import { Input } from '../components/ui/input';
 
@@ -126,12 +126,42 @@ function shortenAddress(address: string, startLength = 4, endLength = 4): string
   return `${address.slice(0, startLength)}...${address.slice(-endLength)}`;
 }
 
+function PositionsList({ positions }: { positions: Position[] }) {
+  return (
+    <div className="flex-1 overflow-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="text-left">Token Pair</TableHead>
+            <TableHead className="text-right">Entry Price</TableHead>
+            <TableHead className="text-right">Current Price</TableHead>
+            <TableHead className="text-right">PNL</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {positions.map((position) => (
+            <TableRow key={position.id}>
+              <TableCell>{`${position.base_token}/${position.quote_token}`}</TableCell>
+              <TableCell className="text-right">${position.created_at_price.toFixed(4)}</TableCell>
+              <TableCell className="text-right">${position.sold_price.toFixed(4)}</TableCell>
+              <TableCell className={`text-right ${position.sold_price >= position.created_at_price ? 'text-green-500' : 'text-red-500'}`}>
+                {((position.sold_price - position.created_at_price) / position.created_at_price * 100).toFixed(2)}%
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
+
 export default function TelegramMiniApp() {
   const [selectedPairAddress, setSelectedPairAddress] = useState<string | null>(null);
   const [signedMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'pairs' | 'positions'>('pairs');
   const [pairs, setPairs] = useState<NewPair[]>([]);
   const [originalPairs, setOriginalPairs] = useState<NewPair[]>([]);
+  const [positions, setPositions] = useState<Position[]>([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -158,6 +188,21 @@ export default function TelegramMiniApp() {
     }
     loadPairs();
   }, []);
+
+  useEffect(() => {
+    async function loadPositions() {
+      if (connected && activeTab === 'positions') {
+        try {
+          const userPositions = await fetchPositions();
+          setPositions(userPositions);
+        } catch (error) {
+          console.error('Error loading positions:', error);
+        }
+      }
+    }
+    loadPositions();
+  }, [connected, activeTab]);
+
 
   // const handleSignMessage = useCallback(async () => {
   //   if (!connected) return;
@@ -310,7 +355,11 @@ export default function TelegramMiniApp() {
         )
       ) : (
         <div className="p-4">
-          <p className="text-center text-gray-400">You currently have no open positions.</p>
+          {positions.length > 0 ? (
+            <PositionsList positions={positions} />
+          ) : (
+            <p className="text-center text-gray-400">You currently have no open positions.</p>
+          )}
         </div>
       )}
     </div>
