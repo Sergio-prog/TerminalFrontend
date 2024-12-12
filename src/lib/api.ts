@@ -1,3 +1,6 @@
+import { useMutation, useQuery } from "react-query";
+import axios from 'axios';
+
 const API_BASE_URL = 'https://secret-ocean-19070-7d15bdda8dde.herokuapp.com/api';
 export type TimeRange = 'm5' | 'h1' | 'h6' | 'h24';
 
@@ -64,6 +67,51 @@ export interface Position {
   created_at: string;
   updated_at: string;
 }
+
+export interface UserWallet {
+  address: string;
+  created_at: string;
+}
+
+export interface CreatedUserWallet extends UserWallet {
+  mnemonic: string;
+  public_key: string;
+}
+
+export interface User {
+  address: string;
+  created_at: string;
+  wallet: UserWallet;
+}
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: true,
+});
+
+export const useSignup = () => {
+  return useMutation(async (data: { signature: string, address: string, message: string }): Promise<CreatedUserWallet> => {
+    const response = await api.post('/signup/', data);
+    return response.data;
+  });
+};
+
+export const useLogin = () => {
+  return useMutation(async (data: { signature: string, address: string, message: string }) => {
+    const response = await api.post('/login/', data);
+    return response.data;
+  });
+};
+
+export const useUserMe = () => {
+  return useQuery('userMe', async (): Promise<User> => {
+    const response = await api.get('/users/me/');
+    return response.data;
+  }, {
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+};
 
 export async function fetchNewPairs(): Promise<NewPair[]> {
   try {

@@ -6,11 +6,13 @@ import { toUserFriendlyAddress, useTonConnectUI, useTonWallet } from '@tonconnec
 import { TokenDetail } from '../components/TokenDetail';
 import { Button } from '../components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
-import { Search, LogOut, X } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import WebApp from '@twa-dev/sdk';
-import { fetchNewPairs, NewPair, getPairBySearch, fetchPositions, Position } from '../lib/api';
+import { fetchNewPairs, NewPair, getPairBySearch, fetchPositions, Position, useSignup } from '../lib/api';
 import { ConnectButton } from '../components/ConnectButton';
 import { Input } from '../components/ui/input';
+import { LogoutButton } from "../components/LogoutButton";
+import Cookies from 'js-cookie';
 
 function TradingPairsList({ onSelectPair, pairs }: { onSelectPair: (pairAddress: string) => void, pairs: NewPair[] }) {
   const [page, setPage] = useState(1);
@@ -165,10 +167,43 @@ export default function TelegramMiniApp() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const signup = useSignup();
 
   const connected = useTonWallet();
   const [tonConnectUi] = useTonConnectUI();
   const wallet = tonConnectUi.account;
+  
+  const [isUserAuthorized, setIsUserAuthorized] = useState(false)
+  const toggleAuthorization = () => {
+    setIsUserAuthorized(prevState => !prevState)
+  }
+
+  const handleSignup = async () => {
+    try {
+      const address = wallet?.address;
+      const message = "";
+      if (!address) return;
+      // In a real-world scenario, you'd use a proper signing method here
+      const signature = 'dummy_signature';
+      const isSucess = await signup.mutateAsync({ signature, address, message });
+      if (isSucess) {
+        toggleAuthorization();
+      }
+      alert('Signup/Login successful!');
+    } catch (error) {
+      console.error('Login failed:', error);
+      alert('Signup/Login failed. Please try again.');
+    }
+  };
+
+  useEffect(() => {
+    const access_token = Cookies.get('access_token');
+    if (access_token) {  // TODO: Also need to validate token here
+      setIsUserAuthorized(true);
+    } else {
+      setIsUserAuthorized(false);
+    }
+  })
 
   useEffect(() => {
     WebApp.setHeaderColor('#0a0a0a');
@@ -302,22 +337,23 @@ export default function TelegramMiniApp() {
                 </Button>
                 {connected ? (
                   <>
-                    <CopyableAddressButton address={wallet?.address} />
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="text-blue-500 hover:bg-gray-800"
-                      onClick={async () => {
-                        try {
-                          await tonConnectUi.disconnect();
-                        } catch (error) {
-                          console.error('Error:', error);
-                        }
-                      }}
-                      title="Logout"
-                    >
-                      <LogOut className="h-5 w-5" />
-                    </Button>
+                    {isUserAuthorized ? (
+                      <>
+                        <CopyableAddressButton address={wallet?.address} />
+                        <LogoutButton disconnect={tonConnectUi.disconnect} />
+                      </>
+                      ) : (
+                        <>
+                          <Button
+                          size="default"
+                          className="bg-blue-600 hover:bg-blue-900"
+                          variant="ghost"
+                          onClick={handleSignup}>Login</Button>
+                          
+                          <LogoutButton disconnect={tonConnectUi.disconnect} />
+                        </>
+                      )
+                    }
                   </>
                 ) : (
                   <ConnectButton />
