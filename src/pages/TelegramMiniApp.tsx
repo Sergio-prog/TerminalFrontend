@@ -1,7 +1,7 @@
 'use client'
 
 import logo from '../../public/images/logo.svg';
-import { useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toUserFriendlyAddress, useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
 import { TokenDetail } from '../components/TokenDetail';
 import { Button } from '../components/ui/button';
@@ -10,6 +10,9 @@ import { Search, X } from 'lucide-react';
 import WebApp from '@twa-dev/sdk';
 import { fetchNewPairs, NewPair, getPairBySearch, fetchPositions, Position, useSignup } from '../lib/api';
 import { ConnectButton } from '../components/ConnectButton';
+import { randomBytes } from 'crypto';
+import { decodeJwt, JWTPayload, jwtVerify, SignJWT } from 'jose';
+import useInterval from '../hooks/useInterval';
 import { Input } from '../components/ui/input';
 import { LogoutButton } from "../components/LogoutButton";
 import Cookies from 'js-cookie';
@@ -38,7 +41,7 @@ function TradingPairsList({ onSelectPair, pairs }: { onSelectPair: (pairAddress:
                 key={index}
                 className="border-gray-800 hover:bg-gray-800 cursor-pointer transition-colors"
                 onClick={() => onSelectPair(pair.tokenAddress)}
-                >
+              >
                 <TableCell className="flex items-center gap-3">
                   <img
                     src={pair.icon}
@@ -170,6 +173,7 @@ export default function TelegramMiniApp() {
   const signup = useSignup();
 
   const connected = useTonWallet();
+  const [authorized, setAuthorized] = useState(false);
   const [tonConnectUi] = useTonConnectUI();
   const wallet = tonConnectUi.account;
   
@@ -210,6 +214,78 @@ export default function TelegramMiniApp() {
     WebApp.expand();
     WebApp.ready();
   }, []);
+
+  const recreateProofPayload = useCallback(async () => {
+    if (firstProofLoading.current) {
+      tonConnectUi.setConnectRequestParameters({ state: 'loading' });
+      firstProofLoading.current = false;
+    }
+
+    const payload = Buffer.from(randomBytes(32)).toString('hex');
+    const payloadTokenJwt = await createPayloadToken({ payload: payload });
+    const payloadToken = { tonProof: payloadTokenJwt as string };
+
+    if (payload) {
+      tonConnectUi.setConnectRequestParameters({ state: 'ready', value: payloadToken });
+    } else {
+      tonConnectUi.setConnectRequestParameters(null);
+    }
+  }, [tonConnectUi, firstProofLoading])
+
+  if (firstProofLoading.current) {
+    recreateProofPayload();
+  }
+
+  const recreateInterval = 9 * 60 * 1000;
+  useInterval(recreateProofPayload, recreateInterval);
+
+  function clearCookies() {
+    document.cookie.split(";").forEach(cookie => {
+      const name = cookie.split("=")[0].trim();
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    });
+  }
+
+  async function generatePayload() {
+    const payload = Buffer.from(randomBytes(32)).toString('hex');
+    const payloadTokenJwt = await createPayloadToken({ payload: payload });
+    const payloadToken = { tonProof: payloadTokenJwt as string };
+
+    return payloadToken;
+  }
+
+  useEffect(() =>
+    tonConnectUi.onStatusChange(async w => {
+      const allCookies = document.cookie;
+      const cookies = Object.fromEntries(
+        allCookies.split("; ").map(cookie => cookie.split("="))
+      );
+
+      if (!w) {
+        await generatePayload();
+        clearCookies();
+        setAuthorized(false);
+        return;
+      }
+
+      // if (w.connectItems?.tonProof && 'proof' in w.connectItems.tonProof) {
+      // await TonProofDemoApi.checkProof(w.connectItems.tonProof.proof, w.account);
+      // }
+      if (w.connectItems?.tonProof && 'proof' in w.connectItems.tonProof) {
+        const [address, publicKey] = [w.account.address, w.account.publicKey]
+        if (!address || !publicKey) throw new Error("Error in check proof (signUp)");
+
+        await signUp(address, w.connectItems.tonProof.proof.payload, w.connectItems.tonProof.proof.signature);
+      }
+
+      if (!cookies.accessToken) {
+        tonConnectUi.disconnect();
+        setAuthorized(false);
+        return;
+      }
+
+      setAuthorized(true);
+    }), [tonConnectUi]);
 
   useEffect(() => {
     async function loadPairs() {

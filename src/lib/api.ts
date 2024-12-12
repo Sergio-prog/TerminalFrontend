@@ -141,6 +141,27 @@ export async function fetchNewPairs(): Promise<NewPair[]> {
   }
 }
 
+export async function signUp(address: string, message: string, proof: string): Promise<NewUserWallet> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/signup/`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ address, message, signature: proof })
+      }
+    );
+    if (!response.ok) throw new Error('Failed to signUp user');
+    const data: NewUserWallet = await response.json();
+    console.log(data);
+
+    return data;
+  } catch (error) {
+    console.error('Error:', error)
+  }
+}
+
 export async function fetchPairDetail(address: string): Promise<PairDetail> {
   try {
     const response = await fetch(`${API_BASE_URL}/pairs/${address}`);
