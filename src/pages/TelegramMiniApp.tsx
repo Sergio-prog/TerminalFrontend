@@ -1,16 +1,18 @@
 'use client'
 
 import logo from '../../public/images/logo.svg';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toUserFriendlyAddress, useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
 import { TokenDetail } from '../components/TokenDetail';
 import { Button } from '../components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
-import { Search, LogOut, X } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import WebApp from '@twa-dev/sdk';
-import { fetchNewPairs, NewPair, getPairBySearch, fetchPositions, Position } from '../lib/api';
+import { fetchNewPairs, NewPair, getPairBySearch, fetchPositions, Position, useSignup } from '../lib/api';
 import { ConnectButton } from '../components/ConnectButton';
 import { Input } from '../components/ui/input';
+import { LogoutButton } from "../components/LogoutButton";
+import Cookies from 'js-cookie';
 
 function TradingPairsList({ onSelectPair, pairs }: { onSelectPair: (pairAddress: string) => void, pairs: NewPair[] }) {
   const [page, setPage] = useState(1);
@@ -36,7 +38,7 @@ function TradingPairsList({ onSelectPair, pairs }: { onSelectPair: (pairAddress:
                 key={index}
                 className="border-gray-800 hover:bg-gray-800 cursor-pointer transition-colors"
                 onClick={() => onSelectPair(pair.tokenAddress)}
-                >
+              >
                 <TableCell className="flex items-center gap-3">
                   <img
                     src={pair.icon}
@@ -165,16 +167,89 @@ export default function TelegramMiniApp() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const signup = useSignup();
 
   const connected = useTonWallet();
   const [tonConnectUi] = useTonConnectUI();
   const wallet = tonConnectUi.account;
+  
+  const [isUserAuthorized, setIsUserAuthorized] = useState(false)
+  const toggleAuthorization = () => {
+    setIsUserAuthorized(prevState => !prevState)
+  }
+
+  const handleSignup = async () => {
+    try {
+      const address = wallet?.address;
+      const message = "";
+      if (!address) return;
+      // In a real-world scenario, you'd use a proper signing method here
+      const signature = 'dummy_signature';
+      const isSucess = await signup.mutateAsync({ signature, address, message });
+      if (isSucess) {
+        toggleAuthorization();
+      }
+      alert('Signup/Login successful!');
+    } catch (error) {
+      console.error('Login failed:', error);
+      alert('Signup/Login failed. Please try again.');
+    }
+  };
+
+  useEffect(() => {
+    const access_token = Cookies.get('access_token');
+    if (access_token) {  // TODO: Also need to validate token here
+      setIsUserAuthorized(true);
+    } else {
+      setIsUserAuthorized(false);
+    }
+  })
 
   useEffect(() => {
     WebApp.setHeaderColor('#0a0a0a');
     WebApp.expand();
     WebApp.ready();
   }, []);
+
+  // function clearCookies() {
+  //   document.cookie.split(";").forEach(cookie => {
+  //     const name = cookie.split("=")[0].trim();
+  //     document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+  //   });
+  // }
+
+  // useEffect(() =>
+  //   tonConnectUi.onStatusChange(async w => {
+  //     const allCookies = document.cookie;
+  //     const cookies = Object.fromEntries(
+  //       allCookies.split("; ").map(cookie => cookie.split("="))
+  //     );
+
+  //     if (!w) {
+  //       await generatePayload();
+  //       clearCookies();
+  //       setAuthorized(false);
+  //       return;
+  //     }
+
+  //     // if (w.connectItems?.tonProof && 'proof' in w.connectItems.tonProof) {
+  //     // await TonProofDemoApi.checkProof(w.connectItems.tonProof.proof, w.account);
+  //     // }
+  //     if (w.connectItems?.tonProof && 'proof' in w.connectItems.tonProof) {
+  //       const [address, publicKey] = [w.account.address, w.account.publicKey]
+  //       if (!address || !publicKey) throw new Error("Error in check proof (signUp)");
+
+  //       await signUp(address, w.connectItems.tonProof.proof.payload, w.connectItems.tonProof.proof.signature);
+  //     }
+
+  //     if (!cookies.accessToken) {
+  //       tonConnectUi.disconnect();
+  //       setAuthorized(false);
+  //       return;
+  //     }
+
+  //     setAuthorized(true);
+  //   }), [tonConnectUi]);
 
   useEffect(() => {
     async function loadPairs() {
@@ -302,22 +377,23 @@ export default function TelegramMiniApp() {
                 </Button>
                 {connected ? (
                   <>
-                    <CopyableAddressButton address={wallet?.address} />
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="text-blue-500 hover:bg-gray-800"
-                      onClick={async () => {
-                        try {
-                          await tonConnectUi.disconnect();
-                        } catch (error) {
-                          console.error('Error:', error);
-                        }
-                      }}
-                      title="Logout"
-                    >
-                      <LogOut className="h-5 w-5" />
-                    </Button>
+                    {isUserAuthorized ? (
+                      <>
+                        <CopyableAddressButton address={wallet?.address} />
+                        <LogoutButton disconnect={tonConnectUi.disconnect} />
+                      </>
+                      ) : (
+                        <>
+                          <Button
+                          size="default"
+                          className="bg-blue-600 hover:bg-blue-900"
+                          variant="ghost"
+                          onClick={handleSignup}>Login</Button>
+                          
+                          <LogoutButton disconnect={tonConnectUi.disconnect} />
+                        </>
+                      )
+                    }
                   </>
                 ) : (
                   <ConnectButton />
