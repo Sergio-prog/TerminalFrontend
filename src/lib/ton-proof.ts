@@ -1,58 +1,60 @@
-class TonProofDemoApiService {
-    private localStorageKey = 'demo-api-access-token';
+// import { Account, ConnectAdditionalRequest, TonProofItemReplySuccess } from "@tonconnect/ui-react";
 
-    private host = document.baseURI.replace(/\/$/, '');
+// class TonProofDemoApiService {
+//     private localStorageKey = 'demo-api-access-token';
 
-    public accessToken: string | null = null;
+//     private host = document.baseURI.replace(/\/$/, '');
 
-    public readonly refreshIntervalMs = 9 * 60 * 1000;
+//     public accessToken: string | null = null;
 
-    constructor() {
-        this.accessToken = localStorage.getItem(this.localStorageKey);
+//     public readonly refreshIntervalMs = 9 * 60 * 1000;
 
-        if (!this.accessToken) {
-            this.generatePayload();
-        }
-    }
+//     constructor() {
+//         this.accessToken = localStorage.getItem(this.localStorageKey);
 
-    async generatePayload(): Promise<ConnectAdditionalRequest | null> {
-        try {
-            const response = await (
-                await fetch(`${this.host}/api/generate_payload`, {
-                    method: 'POST',
-                })
-            ).json();
-            return { tonProof: response.payload as string };
-        } catch {
-            return null;
-        }
-    }
+//         if (!this.accessToken) {
+//             this.generatePayload();
+//         }
+//     }
 
-    async checkProof(proof: TonProofItemReplySuccess['proof'], account: Account): Promise<void> {
-        try {
-            const reqBody = {
-                address: account.address,
-                network: account.chain,
-                public_key: account.publicKey,
-                proof: {
-                    ...proof,
-                    state_init: account.walletStateInit,
-                },
-            };
+//     async generatePayload(): Promise<ConnectAdditionalRequest | null> {
+//         try {
+//             const response = await (
+//                 await fetch(`${this.host}/api/generate_payload`, {
+//                     method: 'POST',
+//                 })
+//             ).json();
+//             return { tonProof: response.payload as string };
+//         } catch {
+//             return null;
+//         }
+//     }
 
-            const response = await (
-                await fetch(`${this.host}/api/check_proof`, {
-                    method: 'POST',
-                    body: JSON.stringify(reqBody),
-                })
-            ).json();
+//     async checkProof(proof: TonProofItemReplySuccess['proof'], account: Account): Promise<void> {
+//         try {
+//             const reqBody = {
+//                 address: account.address,
+//                 network: account.chain,
+//                 public_key: account.publicKey,
+//                 proof: {
+//                     ...proof,
+//                     state_init: account.walletStateInit,
+//                 },
+//             };
 
-            if (response?.token) {
-                localStorage.setItem(this.localStorageKey, response.token);
-                this.accessToken = response.token;
-            }
-        } catch (e) {
-            console.log('checkProof error:', e);
-        }
-    }
-}
+//             const response = await (
+//                 await fetch(`${this.host}/api/check_proof`, {
+//                     method: 'POST',
+//                     body: JSON.stringify(reqBody),
+//                 })
+//             ).json();
+
+//             if (response?.token) {
+//                 localStorage.setItem(this.localStorageKey, response.token);
+//                 this.accessToken = response.token;
+//             }
+//         } catch (e) {
+//             console.log('checkProof error:', e);
+//         }
+//     }
+// }

@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "react-query";
 import axios from 'axios';
 
-const API_BASE_URL = 'https://secret-ocean-19070-7d15bdda8dde.herokuapp.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export type TimeRange = 'm5' | 'h1' | 'h6' | 'h24';
 
 export interface NewPair {
@@ -141,7 +141,7 @@ export async function fetchNewPairs(): Promise<NewPair[]> {
   }
 }
 
-export async function signUp(address: string, message: string, proof: string): Promise<NewUserWallet> {
+export async function signUp(address: string, message: string, proof: string): Promise<UserWallet | null> {
   try {
     const response = await fetch(`${API_BASE_URL}/signup/`,
       {
@@ -153,12 +153,13 @@ export async function signUp(address: string, message: string, proof: string): P
       }
     );
     if (!response.ok) throw new Error('Failed to signUp user');
-    const data: NewUserWallet = await response.json();
+    const data: UserWallet = await response.json();
     console.log(data);
 
     return data;
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error:', error);
+    return null;
   }
 }
 
