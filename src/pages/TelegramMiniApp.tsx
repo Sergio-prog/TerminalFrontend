@@ -14,8 +14,6 @@ import { fetchNewPairs, NewPair, getPairBySearch, fetchPositions, Position, useS
 import { ConnectButton } from '../components/ConnectButton';
 import { Input } from '../components/ui/input';
 import { LogoutButton } from "../components/LogoutButton";
-import Cookies from 'js-cookie';
-import { access } from 'fs';
 
 function TradingPairsList({ onSelectPair, pairs }: { onSelectPair: (pairAddress: string) => void, pairs: NewPair[] }) {
   const [page, setPage] = useState(1);
@@ -97,39 +95,39 @@ function TradingPairsList({ onSelectPair, pairs }: { onSelectPair: (pairAddress:
   );
 }
 
-function CopyableAddressButton({ address }: { address?: string }) {
-  const [isCopied, setIsCopied] = useState(false);
+// function CopyableAddressButton({ address }: { address?: string }) {
+//   const [isCopied, setIsCopied] = useState(false);
 
-  const handleCopy = async () => {
-    if (address) {
-      const fullAddress = toUserFriendlyAddress(address);
-      await navigator.clipboard.writeText(fullAddress);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
-    }
-  };
+//   const handleCopy = async () => {
+//     if (address) {
+//       const fullAddress = toUserFriendlyAddress(address);
+//       await navigator.clipboard.writeText(fullAddress);
+//       setIsCopied(true);
+//       setTimeout(() => setIsCopied(false), 2000);
+//     }
+//   };
 
-  if (!address) return null;
+//   if (!address) return null;
 
-  return (
-    <Button
-      variant="ghost"
-      className="text-blue-500 hover:bg-gray-800"
-      onClick={handleCopy}
-    >
-      <p>
-        {shortenAddress(toUserFriendlyAddress(address))}
-        {isCopied && <span className="ml-2 text-green-500">Copied!</span>}
-      </p>
-    </Button>
-  );
-}
+//   return (
+//     <Button
+//       variant="ghost"
+//       className="text-blue-500 hover:bg-gray-800"
+//       onClick={handleCopy}
+//     >
+//       <p>
+//         {shortenAddress(toUserFriendlyAddress(address))}
+//         {isCopied && <span className="ml-2 text-green-500">Copied!</span>}
+//       </p>
+//     </Button>
+//   );
+// }
 
-function shortenAddress(address: string, startLength = 4, endLength = 4): string {
-  if (!address) return "";
-  if (address.length <= startLength + endLength) return address;
-  return `${address.slice(0, startLength)}...${address.slice(-endLength)}`;
-}
+// function shortenAddress(address: string, startLength = 4, endLength = 4): string {
+//   if (!address) return "";
+//   if (address.length <= startLength + endLength) return address;
+//   return `${address.slice(0, startLength)}...${address.slice(-endLength)}`;
+// }
 
 function PositionsList({ positions }: { positions: Position[] }) {
   return (
@@ -220,6 +218,11 @@ export default function TelegramMiniApp() {
   };
 
   const handleLogin = async () => {
+    if (!wallet?.address) {
+      alert('Please connect your wallet first.');
+      return;
+    }
+
     try {
       const address = toUserFriendlyAddress(wallet?.address);
       const message = "hello world";
@@ -432,8 +435,8 @@ export default function TelegramMiniApp() {
                 </Button>
                 {wallet ? (
                   <>
-                    {isUserExists ? (
-                      isUserAuthorized ? (
+                    { true ? (
+                      true ? (
                         <>
                           <WalletDropdown wallet={toUserFriendlyAddress(wallet.address)} />
                           <LogoutButton disconnect={() => tonConnectUi.disconnect()} />
