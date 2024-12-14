@@ -1,4 +1,7 @@
-const API_BASE_URL = 'https://secret-ocean-19070-7d15bdda8dde.herokuapp.com/api';
+import { useMutation, useQuery } from "react-query";
+import axios from 'axios';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export type TimeRange = 'm5' | 'h1' | 'h6' | 'h24';
 
 export interface NewPair {
@@ -65,6 +68,51 @@ export interface Position {
   updated_at: string;
 }
 
+export interface UserWallet {
+  address: string;
+  created_at: string;
+}
+
+export interface CreatedUserWallet extends UserWallet {
+  mnemonic: string;
+  public_key: string;
+}
+
+export interface User {
+  address: string;
+  created_at: string;
+  wallet: UserWallet;
+}
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: true,
+});
+
+export const useSignup = () => {
+  return useMutation(async (data: { signature: string, address: string, message: string }): Promise<CreatedUserWallet> => {
+    const response = await api.post('/signup/', data);
+    return response.data;
+  });
+};
+
+export const useLogin = () => {
+  return useMutation(async (data: { signature: string, address: string, message: string }) => {
+    const response = await api.post('/login/', data);
+    return response.data;
+  });
+};
+
+export const useUserMe = () => {
+  return useQuery('userMe', async (): Promise<User> => {
+    const response = await api.get('/users/me/');
+    return response.data;
+  }, {
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+};
+
 export async function fetchNewPairs(): Promise<NewPair[]> {
   try {
     const response = await fetch(`${API_BASE_URL}/pairs/trending/`);
@@ -90,6 +138,28 @@ export async function fetchNewPairs(): Promise<NewPair[]> {
     }));
   } catch (error) {
     throw error;
+  }
+}
+
+export async function signUp(address: string, message: string, proof: string): Promise<UserWallet | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/signup/`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ address, message, signature: proof })
+      }
+    );
+    if (!response.ok) throw new Error('Failed to signUp user');
+    const data: UserWallet = await response.json();
+    console.log(data);
+
+    return data;
+  } catch (error) {
+    console.error('Error:', error);
+    return null;
   }
 }
 
