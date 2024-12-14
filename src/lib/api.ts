@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "react-query";
-import axios from 'axios';
+import api from './apiClient';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export type TimeRange = 'm5' | 'h1' | 'h6' | 'h24';
@@ -84,11 +84,6 @@ export interface User {
   wallet: UserWallet;
 }
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  withCredentials: true,
-});
-
 export const useSignup = () => {
   return useMutation(async (data: { signature: string, address: string, message: string }): Promise<CreatedUserWallet> => {
     const response = await api.post('/signup/', data);
@@ -112,6 +107,42 @@ export const useUserMe = () => {
     refetchOnWindowFocus: false,
   });
 };
+
+export const useCheckUserExists = (address: string | undefined) => {
+  return useQuery(
+    ['checkUserExists', address],
+    async (): Promise<boolean> => {
+      if (!address) return false;
+      try {
+        const response = await api.get(`/users/${address}/exists`);
+        console.log(`Address checked: ${address}`);
+        console.log(`User exists: ${response.data.exists}`);
+        return response.data.exists;
+      } catch (error) {
+        console.error('Error checking if user exists:', error);
+        return false;
+      }
+    }
+  );
+};
+
+// export const checkUserExists = (address: string) => {
+//   return useQuery('IsUserExists', async (): Promise<boolean> => {
+//     const response = await api.get(`/users/${address}/exists`);
+//     return response.data.exists;
+//   });
+// };
+
+
+// export const checkUserExists = async (address: string): Promise<boolean> => {
+//   try {
+//     const response = await api.get(`/users/${address}/exists`);
+//     return response.data.exists;
+//   } catch (error) {
+//     console.error('Error checking if user exists:', error);
+//     return false;
+//   }
+// };
 
 export async function fetchNewPairs(): Promise<NewPair[]> {
   try {

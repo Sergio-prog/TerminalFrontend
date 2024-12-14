@@ -4,15 +4,18 @@ import logo from '../../public/images/logo.svg';
 import { useEffect, useRef, useState } from 'react';
 import { toUserFriendlyAddress, useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
 import { TokenDetail } from '../components/TokenDetail';
+import { SignupSuccessModal } from '../components/SignupSuccessModal'
+import { WalletDropdown } from "../components/WalletDropdown";
 import { Button } from '../components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { Search, X } from 'lucide-react';
 import WebApp from '@twa-dev/sdk';
-import { fetchNewPairs, NewPair, getPairBySearch, fetchPositions, Position, useSignup } from '../lib/api';
+import { fetchNewPairs, NewPair, getPairBySearch, fetchPositions, Position, useSignup, useLogin, useCheckUserExists } from '../lib/api';
 import { ConnectButton } from '../components/ConnectButton';
 import { Input } from '../components/ui/input';
 import { LogoutButton } from "../components/LogoutButton";
 import Cookies from 'js-cookie';
+import { access } from 'fs';
 
 function TradingPairsList({ onSelectPair, pairs }: { onSelectPair: (pairAddress: string) => void, pairs: NewPair[] }) {
   const [page, setPage] = useState(1);
@@ -167,40 +170,81 @@ export default function TelegramMiniApp() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [showSignupModal, setShowSignupModal] = useState(false);
+  const [signupData, setSignupData] = useState<{ address: string; mnemonic: string } | null>(null);
   const signup = useSignup();
+  const login = useLogin();
 
   const connected = useTonWallet();
   const [tonConnectUi] = useTonConnectUI();
   const wallet = tonConnectUi.account;
-  
+
+  const { data: isUserExists, refetch: refetchUserExists } = useCheckUserExists(
+    wallet?.address ? toUserFriendlyAddress(wallet.address) : undefined
+  );
+
   const [isUserAuthorized, setIsUserAuthorized] = useState(false)
-  const toggleAuthorization = () => {
-    setIsUserAuthorized(prevState => !prevState)
-  }
+
+  const allCookies = document.cookie;
+      const cookies = Object.fromEntries(
+        allCookies.split("; ").map(cookie => cookie.split("="))
+      );
+
 
   const handleSignup = async () => {
+    if (!wallet?.address) {
+      alert('Please connect your wallet first.');
+      return;
+    }
+
     try {
-      const address = wallet?.address;
-      const message = "";
-      if (!address) return;
-      // In a real-world scenario, you'd use a proper signing method here
+      const address = toUserFriendlyAddress(wallet.address);
+      const message = "hello world";
       const signature = 'dummy_signature';
-      const isSucess = await signup.mutateAsync({ signature, address, message });
-      if (isSucess) {
-        toggleAuthorization();
+      const response = await signup.mutateAsync({ signature, address, message });
+
+      if (response && response.address && response.mnemonic) {
+        setIsUserAuthorized(true);
+        setSignupData({
+          address: response.address,
+          mnemonic: response.mnemonic
+        });
+        setShowSignupModal(true);
+      } else {
+        throw new Error('Invalid response from server');
       }
-      alert('Signup/Login successful!');
+    } catch (error) {
+      console.error('Signup failed:', error);
+      alert('Signup failed. Please try again.');
+    }
+  };
+
+  const handleLogin = async () => {
+    try {
+      const address = toUserFriendlyAddress(wallet?.address);
+      const message = "hello world";
+      if (!address) return;
+      const signature = 'dummy_signature';
+      const response = await login.mutateAsync({ signature, address, message });
+
+      if (response.ok) {
+        setIsUserAuthorized(true)
+      }
+      console.log(response.ok)
+      console.log(isUserAuthorized);
+      console.log(isUserExists);
     } catch (error) {
       console.error('Login failed:', error);
-      alert('Signup/Login failed. Please try again.');
+      alert('Login failed. Please try again.');
     }
   };
 
   useEffect(() => {
-    const access_token = Cookies.get('access_token');
+    const access_token = cookies.access_token
     if (access_token) {  // TODO: Also need to validate token here
       setIsUserAuthorized(true);
     } else {
+      console.log(access_token)
       setIsUserAuthorized(false);
     }
   })
@@ -263,6 +307,12 @@ export default function TelegramMiniApp() {
     }
     loadPairs();
   }, []);
+
+  useEffect(() => {
+    if (wallet?.address) {
+      refetchUserExists();
+    }
+  }, [wallet?.address, refetchUserExists]);
 
   useEffect(() => {
     async function loadPositions() {
@@ -328,6 +378,11 @@ export default function TelegramMiniApp() {
     setActiveTab('pairs');
   };
 
+  const handleCloseSignupModal = () => {
+    setShowSignupModal(false);
+    setSignupData(null);
+  };
+
   return (
     <div className="relative flex flex-col min-h-screen bg-[#0a0a0a] text-white overflow-hidden">
       <div className="absolute inset-0 z-0 overflow-hidden">
@@ -375,25 +430,40 @@ export default function TelegramMiniApp() {
                 >
                   <Search className="h-5 w-5" />
                 </Button>
-                {connected ? (
+                {wallet ? (
                   <>
-                    {isUserAuthorized ? (
-                      <>
-                        <CopyableAddressButton address={wallet?.address} />
-                        <LogoutButton disconnect={tonConnectUi.disconnect} />
-                      </>
+                    {isUserExists ? (
+                      isUserAuthorized ? (
+                        <>
+                          <WalletDropdown wallet={toUserFriendlyAddress(wallet.address)} />
+                          <LogoutButton disconnect={() => tonConnectUi.disconnect()} />
+                        </>
                       ) : (
                         <>
                           <Button
+                            size="default"
+                            className="bg-blue-600 hover:bg-blue-900"
+                            variant="ghost"
+                            onClick={handleLogin}
+                          >
+                            Login
+                          </Button>
+                          <LogoutButton disconnect={() => tonConnectUi.disconnect()} />
+                        </>
+                      )
+                    ) : (
+                      <>
+                        <Button
                           size="default"
                           className="bg-blue-600 hover:bg-blue-900"
                           variant="ghost"
-                          onClick={handleSignup}>Login</Button>
-                          
-                          <LogoutButton disconnect={tonConnectUi.disconnect} />
-                        </>
-                      )
-                    }
+                          onClick={handleSignup}
+                        >
+                          Sign Up
+                        </Button>
+                        <LogoutButton disconnect={() => tonConnectUi.disconnect()} />
+                      </>
+                    )}
                   </>
                 ) : (
                   <ConnectButton />
@@ -449,6 +519,14 @@ export default function TelegramMiniApp() {
         </div>
       )}
     </div>
+    {signupData && (
+        <SignupSuccessModal
+          isOpen={showSignupModal}
+          onClose={handleCloseSignupModal}
+          address={signupData.address}
+          mnemonic={signupData.mnemonic}
+        />
+      )}
     </div>
   );
 }
