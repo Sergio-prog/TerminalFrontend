@@ -435,8 +435,8 @@ export default function TelegramMiniApp() {
                 </Button>
                 {wallet ? (
                   <>
-                    { true ? (
-                      true ? (
+                    { isUserExists ? (
+                        isUserAuthorized ? (
                         <>
                           <WalletDropdown wallet={shortenAddress(toUserFriendlyAddress(wallet.address))} />
                           <LogoutButton disconnect={() => tonConnectUi.disconnect()} />
