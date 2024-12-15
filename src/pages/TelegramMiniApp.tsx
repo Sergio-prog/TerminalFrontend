@@ -123,11 +123,11 @@ function TradingPairsList({ onSelectPair, pairs }: { onSelectPair: (pairAddress:
 //   );
 // }
 
-// function shortenAddress(address: string, startLength = 4, endLength = 4): string {
-//   if (!address) return "";
-//   if (address.length <= startLength + endLength) return address;
-//   return `${address.slice(0, startLength)}...${address.slice(-endLength)}`;
-// }
+function shortenAddress(address: string, startLength = 4, endLength = 4): string {
+  if (!address) return "";
+  if (address.length <= startLength + endLength) return address;
+  return `${address.slice(0, startLength)}...${address.slice(-endLength)}`;
+}
 
 function PositionsList({ positions }: { positions: Position[] }) {
   return (
@@ -438,7 +438,7 @@ export default function TelegramMiniApp() {
                     {isUserExists ? (
                       isUserAuthorized ? (
                         <>
-                          <WalletDropdown wallet={toUserFriendlyAddress(wallet.address)} />
+                          <WalletDropdown wallet={shortenAddress(toUserFriendlyAddress(wallet.address))} />
                           <LogoutButton disconnect={() => tonConnectUi.disconnect()} />
                         </>
                       ) : (
