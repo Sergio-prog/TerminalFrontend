@@ -178,7 +178,7 @@ export default function TelegramMiniApp() {
   const wallet = tonConnectUi.account;
 
   const { data: isUserExists, refetch: refetchUserExists } = useCheckUserExists(
-    wallet?.address ? toUserFriendlyAddress(wallet.address) : undefined
+    wallet?.address ? toUserFriendlyAddress(wallet?.address || "") : undefined
   );
 
   const [isUserAuthorized, setIsUserAuthorized] = useState(false)

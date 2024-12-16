@@ -35,7 +35,6 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
             setIsLoading(true);
             try {
                 const tokenDetail = await fetchPairDetail(address);
-                console.log(wallet.address)
                 setData(tokenDetail);
             } catch (err) {
                 setError(err instanceof Error ? err : new Error('An error occurred'));

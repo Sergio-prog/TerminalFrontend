@@ -91,11 +91,33 @@ export interface User {
   wallet: UserWallet;
 }
 
+export interface SwapParams {
+  pair_address: string;
+  jetton_address: string;
+  is_ton_transfer: boolean;
+  amount: number;
+  slippage: number;
+}
+
 export const useSignup = () => {
   return useMutation(async (data: { signature: string, address: string, message: string }): Promise<CreatedUserWallet> => {
     const response = await api.post('/signup/', data, { withCredentials: true });
     return response.data;
   });
+};
+
+export const useSwap = () => {
+  return useMutation(
+    (params: SwapParams) => api.post('/wallets/swap/', params),
+    {
+      onSuccess: (data) => {
+        console.log('Swap successful', data);
+      },
+      onError: (error) => {
+        console.error('Swap failed', error);
+      },
+    }
+  );
 };
 
 export const useLogin = () => {
