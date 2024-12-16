@@ -88,14 +88,14 @@ export interface User {
 
 export const useSignup = () => {
   return useMutation(async (data: { signature: string, address: string, message: string }): Promise<CreatedUserWallet> => {
-    const response = await api.post('/signup/', data);
+    const response = await api.post('/signup/', data, { withCredentials: true });
     return response.data;
   });
 };
 
 export const useLogin = () => {
   return useMutation(async (data: { signature: string, address: string, message: string }) => {
-    const response = await api.post('/login/', data);
+    const response = await api.post('/login/', data, { withCredentials: true });
     return response.data;
   });
 };
