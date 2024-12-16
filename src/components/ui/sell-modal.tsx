@@ -20,7 +20,7 @@ type LimitType = 'MC is' | 'Price';
 export function SellModal({ isOpen, onClose, pairSymbol, pairPrice, base_token, base_token_icon, quote_token }: SellModalProps) {
   const [tonConnectUI] = useTonConnectUI();
   const isWalletConnected = tonConnectUI.connected;
-  const [tonBalance] = useState(5.77)
+  const [tonBalance] = useState(0)
   const [tonAmount, setTonAmount] = useState(0)
   const [activePercentage, setActivePercentage] = useState<number | null>(null);
   const modalRef = useRef<HTMLDivElement>(null)
