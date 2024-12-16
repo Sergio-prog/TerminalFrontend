@@ -247,7 +247,6 @@ export default function TelegramMiniApp() {
     if (access_token) {  // TODO: Also need to validate token here
       setIsUserAuthorized(true);
     } else {
-      console.log(access_token)
       setIsUserAuthorized(false);
     }
   })
@@ -383,7 +382,6 @@ export default function TelegramMiniApp() {
 
   const handleCloseSignupModal = () => {
     setShowSignupModal(false);
-    setSignupData(null);
   };
 
   return (
@@ -438,12 +436,19 @@ export default function TelegramMiniApp() {
                     {isUserExists ? (
                       isUserAuthorized ? (
                         <>
-                          <WalletDropdown wallet={shortenAddress(toUserFriendlyAddress(wallet.address))} />
+                          <WalletDropdown wallet={shortenAddress(signupData?.address || toUserFriendlyAddress(wallet.address))} />
                           <LogoutButton disconnect={() => tonConnectUi.disconnect()} />
                         </>
                       ) : (
                         <>
-                          <WalletDropdown wallet={shortenAddress(toUserFriendlyAddress(wallet.address))} />
+                          <Button
+                            size="default"
+                            className="bg-blue-600 hover:bg-blue-900"
+                            variant="ghost"
+                            onClick={handleSignup}
+                          >
+                            Sign Up
+                          </Button>
                           <LogoutButton disconnect={() => tonConnectUi.disconnect()} />
                         </>
                       )
@@ -464,6 +469,7 @@ export default function TelegramMiniApp() {
                 ) : (
                   <ConnectButton />
                 )}
+
 
               </div>
             </>
