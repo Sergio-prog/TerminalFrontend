@@ -148,7 +148,6 @@ export function BuyModal({ isOpen, onClose, pairSymbol, pairPrice, tonBalance}: 
           </div>
           <input
             type="text"
-            value={tonAmount === 0 ? "" : tonAmount}
             onChange={(e) => {
               const value = e.target.value;
               if (/^\d*$/.test(value)) {
@@ -186,7 +185,7 @@ export function BuyModal({ isOpen, onClose, pairSymbol, pairPrice, tonBalance}: 
         <div className="space-y-3">
           {[
             { label: "Entry price", value: `${pairPrice} TON` },
-            { label: "Position size", value: `${(tonAmount / pairPrice).toFixed(2)} ${pairSymbol}`},
+            { label: "Position size", value: `${pairPrice > 0 && !isNaN(tonAmount) && !isNaN(pairPrice) ? (tonAmount / pairPrice).toFixed(2) : "0.00"} ${pairSymbol}` },
             { label: "Slippage", value: "10%" },
           ].map(({ label, value }) => (
             <div key={label} className="flex justify-between text-sm">

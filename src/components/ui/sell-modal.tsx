@@ -151,7 +151,6 @@ export function SellModal({ isOpen, onClose, pairSymbol, pairPrice, base_token, 
           </div>
           <input
             type="text"
-            value={tonAmount === null ? "" : tonAmount}
             onChange={(e) => {
               const value = e.target.value;
               if (/^\d*\.?\d*$/.test(value)) {
@@ -189,7 +188,7 @@ export function SellModal({ isOpen, onClose, pairSymbol, pairPrice, base_token, 
         <div className="space-y-3">
           {[
             { label: "Entry price", value: `${pairPrice} ${quote_token}`},
-            { label: "Position size", value: `${(tonAmount * pairPrice).toFixed(2)} ${quote_token}` },
+            { label: "Position size", value: `${pairPrice > 0 && !isNaN(tonAmount) && !isNaN(pairPrice) ? (tonAmount / pairPrice).toFixed(2) : "0.00"} ${pairSymbol}` },
             { label: "Slippage", value: "10%" },
           ].map(({ label, value }) => (
             <div key={label} className="flex justify-between text-sm">
