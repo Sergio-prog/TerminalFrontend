@@ -75,6 +75,11 @@ export interface UserWallet {
   created_at: string;
 }
 
+export interface WalletBalance {
+  status: string;
+  balance: number;
+}
+
 export interface CreatedUserWallet extends UserWallet {
   mnemonic: string;
   public_key: string;
@@ -281,3 +286,13 @@ export async function fetchPositions(): Promise<Position[]> {
     throw error;
   }
 }
+
+export const useWalletBalance = (walletAddress: string) => {
+  return useQuery<WalletBalance>(
+    ['walletBalance', walletAddress],
+    async () => {
+      const response = await api.get(`/wallets/${walletAddress}/`);
+      return response.data;
+    }
+  );
+};

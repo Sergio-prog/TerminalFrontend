@@ -9,15 +9,15 @@ interface BuyModalProps {
   onClose: () => void;
   pairSymbol: string;
   pairPrice: number;
+  tonBalance: number;
 }
 
 type OrderType = 'Market' | 'Limit';
 type LimitType = 'MC is' | 'Price';
 
-export function BuyModal({ isOpen, onClose, pairSymbol, pairPrice }: BuyModalProps) {
+export function BuyModal({ isOpen, onClose, pairSymbol, pairPrice, tonBalance}: BuyModalProps) {
   const [tonConnectUI] = useTonConnectUI();
   const isWalletConnected = tonConnectUI.connected;
-  const [tonBalance] = useState(5.77)
   const [tonAmount, setTonAmount] = useState(0)
   const [activePercentage, setActivePercentage] = useState<number | null>(null);
   const modalRef = useRef<HTMLDivElement>(null)
