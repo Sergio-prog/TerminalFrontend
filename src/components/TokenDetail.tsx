@@ -2,12 +2,13 @@ import { useState, useEffect, useRef } from 'react'
 import { Check, Copy, ChevronRight, ChevronLeft } from 'lucide-react'
 import { BuyModal } from './ui/buy-modal';
 import { SellModal } from './ui/sell-modal';
-import { fetchPairDetail, PairDetail } from '../lib/api';
+import { fetchPairDetail, PairDetail, useWalletBalance } from '../lib/api';
 import DexScreenerEmbed from './DexScreenerEmbed';
 import { PriceChangeTabs } from './ui/price-change-tabs';
 import { HistoryAndOrdersTabs } from './ui/history_and_orders_tabs';
 import { VolumeIndicator } from '../components/ui/volume-indicator';
 import WebApp from '@twa-dev/sdk'
+import { useTonConnectUI } from '@tonconnect/ui-react';
 
 type TimeRange = 'm5' | 'h1' | 'h6' | 'h24';
 
@@ -24,11 +25,20 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
     const headerRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
 
+    const [tonConnectUi] = useTonConnectUI();
+    const wallet = tonConnectUi.account;
+
+    let walletData = null;
+    if (wallet) {
+        ({ data: walletData } = useWalletBalance(wallet?.address));
+    }
+
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
             try {
                 const tokenDetail = await fetchPairDetail(address);
+                console.log(wallet.address)
                 setData(tokenDetail);
             } catch (err) {
                 setError(err instanceof Error ? err : new Error('An error occurred'));
@@ -198,7 +208,7 @@ export function TokenDetail({ address, onBack }: { address: string; onBack: () =
                 </button>
             </div>
 
-            <BuyModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} pairSymbol={data.name} pairPrice={data.price_ton} />
+            <BuyModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} pairSymbol={data.name} pairPrice={data.price_ton} tonBalance={walletData?.balance || 0} />
             <SellModal
               isOpen={isSellModalOpen}
               onClose={() => setIsSellModalOpen(false)}
