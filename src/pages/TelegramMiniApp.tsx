@@ -10,7 +10,7 @@ import { Button } from '../components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { Search, X } from 'lucide-react';
 import WebApp from '@twa-dev/sdk';
-import { fetchNewPairs, NewPair, getPairBySearch, fetchPositions, Position, useSignup, useLogin, useCheckUserExists } from '../lib/api';
+import { fetchNewPairs, NewPair, getPairBySearch, fetchPositions, Position, useSignup, useCheckUserExists } from '../lib/api';
 import { ConnectButton } from '../components/ConnectButton';
 import { Input } from '../components/ui/input';
 import { LogoutButton } from "../components/LogoutButton";
@@ -171,7 +171,7 @@ export default function TelegramMiniApp() {
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [signupData, setSignupData] = useState<{ address: string; mnemonic: string } | null>(null);
   const signup = useSignup();
-  const login = useLogin();
+  // const login = useLogin();
 
   const connected = useTonWallet();
   const [tonConnectUi] = useTonConnectUI();
@@ -217,30 +217,30 @@ export default function TelegramMiniApp() {
     }
   };
 
-  const handleLogin = async () => {
-    if (!wallet?.address) {
-      alert('Please connect your wallet first.');
-      return;
-    }
+  // const handleLogin = async () => {
+  //   if (!wallet?.address) {
+  //     alert('Please connect your wallet first.');
+  //     return;
+  //   }
 
-    try {
-      const address = toUserFriendlyAddress(wallet?.address);
-      const message = "hello world";
-      if (!address) return;
-      const signature = 'dummy_signature';
-      const response = await login.mutateAsync({ signature, address, message });
+  //   try {
+  //     const address = toUserFriendlyAddress(wallet?.address);
+  //     const message = "hello world";
+  //     if (!address) return;
+  //     const signature = 'dummy_signature';
+  //     const response = await login.mutateAsync({ signature, address, message });
 
-      if (response.ok) {
-        setIsUserAuthorized(true)
-      }
-      console.log(response.ok)
-      console.log(isUserAuthorized);
-      console.log(isUserExists);
-    } catch (error) {
-      console.error('Login failed:', error);
-      alert('Login failed. Please try again.');
-    }
-  };
+  //     if (response.ok) {
+  //       setIsUserAuthorized(true)
+  //     }
+  //     console.log(response.ok)
+  //     console.log(isUserAuthorized);
+  //     console.log(isUserExists);
+  //   } catch (error) {
+  //     console.error('Login failed:', error);
+  //     alert('Login failed. Please try again.');
+  //   }
+  // };
 
   useEffect(() => {
     const access_token = cookies.access_token
@@ -435,22 +435,15 @@ export default function TelegramMiniApp() {
                 </Button>
                 {wallet ? (
                   <>
-                    { isUserExists ? (
-                        isUserAuthorized ? (
+                    {isUserExists ? (
+                      isUserAuthorized ? (
                         <>
                           <WalletDropdown wallet={shortenAddress(toUserFriendlyAddress(wallet.address))} />
                           <LogoutButton disconnect={() => tonConnectUi.disconnect()} />
                         </>
                       ) : (
                         <>
-                          <Button
-                            size="default"
-                            className="bg-blue-600 hover:bg-blue-900"
-                            variant="ghost"
-                            onClick={handleLogin}
-                          >
-                            Login
-                          </Button>
+                          <WalletDropdown wallet={shortenAddress(toUserFriendlyAddress(wallet.address))} />
                           <LogoutButton disconnect={() => tonConnectUi.disconnect()} />
                         </>
                       )
@@ -471,6 +464,7 @@ export default function TelegramMiniApp() {
                 ) : (
                   <ConnectButton />
                 )}
+
               </div>
             </>
           )}
