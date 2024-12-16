@@ -9,12 +9,15 @@ interface SellModalProps {
   onClose: () => void;
   pairSymbol: string;
   pairPrice: number;
+  base_token: string; // KAT
+  base_token_icon: string;
+  quote_token: string; // TON
 }
 
 type OrderType = 'Market' | 'Limit';
 type LimitType = 'MC is' | 'Price';
 
-export function SellModal({ isOpen, onClose, pairSymbol, pairPrice }: SellModalProps) {
+export function SellModal({ isOpen, onClose, pairSymbol, pairPrice, base_token, base_token_icon, quote_token }: SellModalProps) {
   const [tonConnectUI] = useTonConnectUI();
   const isWalletConnected = tonConnectUI.connected;
   const [tonBalance] = useState(5.77)
@@ -25,7 +28,7 @@ export function SellModal({ isOpen, onClose, pairSymbol, pairPrice }: SellModalP
   const [startY, setStartY] = useState(0)
   const [orderType, setOrderType] = useState<OrderType>('Market')
   const [limitType, setLimitType] = useState<LimitType>('MC is')
-  const [limitValue, setLimitValue] = useState(0)
+  const [_, setLimitValue] = useState(0)
 
   const handlePercentageClick = (percentage: number) => {
     if (isWalletConnected) {
@@ -89,7 +92,7 @@ export function SellModal({ isOpen, onClose, pairSymbol, pairPrice }: SellModalP
         <div className="flex justify-between items-center gap-6">
           <div className={cn("flex-1 flex justify-between items-center p-3 rounded-md", "bg-neutral-800")}>
             <div className="flex items-center gap-2">
-              <img src="/images/ton_logo.png" alt="TON Logo" className="w-6 h-6" />
+              <img src={base_token_icon} alt="TON Logo" className="w-6 h-6" />
               <span>Balance</span>
             </div>
             <span>{isWalletConnected ? tonBalance.toFixed(2) : '-'}</span>
@@ -126,10 +129,10 @@ export function SellModal({ isOpen, onClose, pairSymbol, pairPrice }: SellModalP
             </div>
             <input
               type="text"
-              value={limitValue === 0 ? "" : limitValue}
+              value={0}
               onChange={(e) => {
                 const value = e.target.value;
-                if (/^\d*$/.test(value)) {
+                if (/\d*$/.test(value)) {
                   setLimitValue(value === "" ? 0 : Number(value));
                 }
               }}
@@ -143,23 +146,23 @@ export function SellModal({ isOpen, onClose, pairSymbol, pairPrice }: SellModalP
 
         <div className={cn("flex justify-between items-center p-3 rounded-md", "bg-neutral-800")}>
           <div className="flex items-center gap-2">
-            <img src="/images/ton_logo.png" alt="TON Logo" className="w-6 h-6" />
-            <span>TON</span>
+            <img src={base_token_icon} alt="TON Logo" className="w-6 h-6" />
+            <span>{base_token}</span>
           </div>
           <input
             type="text"
-            value={tonAmount === 0 ? "" : tonAmount}
+            value={tonAmount === null ? "" : tonAmount}
             onChange={(e) => {
               const value = e.target.value;
-              if (/^\d*$/.test(value)) {
-                setTonAmount(value === "" ? 0 : Number(value));
+              if (/^\d*\.?\d*$/.test(value)) {
+                setTonAmount(value === "" ? 0 : parseFloat(value));
               }
             }}
             className="bg-transparent text-right w-24 focus:outline-none"
             placeholder="Amount"
             disabled={!isWalletConnected}
-            inputMode="numeric"
-            pattern="[0-9]*"
+            inputMode="decimal"
+            pattern="[0-9]*\.?[0-9]*"
           />
         </div>
 
@@ -185,8 +188,8 @@ export function SellModal({ isOpen, onClose, pairSymbol, pairPrice }: SellModalP
 
         <div className="space-y-3">
           {[
-            { label: "Entry price", value: `${pairPrice} TON`},
-            { label: "Position size", value: `${(tonAmount / pairPrice).toFixed(2)} ${pairSymbol}` },
+            { label: "Entry price", value: `${pairPrice} ${quote_token}`},
+            { label: "Position size", value: `${(tonAmount * pairPrice).toFixed(2)} ${quote_token}` },
             { label: "Slippage", value: "10%" },
           ].map(({ label, value }) => (
             <div key={label} className="flex justify-between text-sm">

@@ -29,6 +29,8 @@ export interface NewPair {
 
 export interface PairDetail {
   name: string;
+  base_token: string;
+  quote_token: string;
   tokenAddress: string;
   symbol: string;
   icon: string;
@@ -212,11 +214,13 @@ export function mapPairDetailToTokenDetail(data: any): PairDetail {
 
   return {
     name: data.base_token.symbol,
+    base_token: data.base_token.symbol,
+    quote_token: data.quote_token.symbol,
     tokenAddress: data.base_token.address,
     icon: data.attributes?.image_url || data.info?.imageUrl,
     symbol: data.attributes?.symbol,
     price_ton: data.price_native,
-    price_usd: data.price_usd,
+    price_usd: data.price_usd, // base token price
     change24h: data.price_change.h24,
     marketCap: data.market_cap || 0,
     supply: data.liquidity.base || 0,
